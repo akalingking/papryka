@@ -14,7 +14,7 @@
  * @file        memfeed.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 16, 2016 1:18 AM
- * @copyright   2017 www.sequenceresearch.com
+ * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
  */
 #pragma once
 #include "feed.h"
