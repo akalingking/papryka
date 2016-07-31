@@ -14,7 +14,7 @@
  * @file        synthetic.cpp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 16, 2016 1:01 AM
- * @copyright   2017 www.sequenceresearch.com
+ * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
  */
 #define SPDLOG_DEBUG_ON
 //#define SPDLOG_TRACE_ON
