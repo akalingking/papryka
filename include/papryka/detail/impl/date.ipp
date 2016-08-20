@@ -14,7 +14,7 @@
  * @file        date.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 2, 2016 8:41 PM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 namespace {
     time_t get_utc_offset()
@@ -58,7 +58,7 @@ namespace {
             }
             else
             {
-                log_trace("error: invalid timezone \"{}\" offset={ld}", tz, offset);
+                log_error("invalid timezone \"{}\" offset={ld}", tz, offset);
                 ret = false;
             }
             
@@ -165,7 +165,7 @@ const char* to_str(const datetime_t& datetime, const char* dateFormat, const cha
         }
         else
         {
-            log_trace("error: timezone \"{}\", invalid offset {ld}", getenv("TZ"), offset);
+            log_error("timezone \"{}\", invalid offset {ld}", getenv("TZ"), offset);
         }
         
         if (old_tz != nullptr)
@@ -212,7 +212,7 @@ datetime_t to_tz(const datetime_t& datetime, const char* tz)
     }
     else
     {
-        log_trace("timezone \"{}\", invalid offset {ld}", getenv("TZ"), offset);
+        log_error("timezone \"{}\", invalid offset {ld}", getenv("TZ"), offset);
     }
 
     if (old_tz != nullptr)

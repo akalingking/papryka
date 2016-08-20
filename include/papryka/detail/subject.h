@@ -14,22 +14,21 @@
  * @file        subject.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 9, 2016 1:27 AM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
 namespace papryka {
-    /**
-     * base class for objects fed to dispatchers
-     */
-    struct Subject {
-        virtual void start() = 0;
-        virtual void stop() = 0;
-        virtual bool dispatch() = 0;
-        virtual bool eof() = 0;
-        virtual datetime_t peek_date() = 0;
+
+struct Subject 
+{
+    virtual void start() = 0;
+    virtual void stop() = 0;
+    virtual bool dispatch() = 0;
+    virtual bool eof() = 0;
+    virtual datetime_t peek_date() = 0;
+
+protected:
+    Subject() = default;
+};
     
-    protected:
-        Subject() = default;
-    };
-    
-} // namespace papryka
+}
