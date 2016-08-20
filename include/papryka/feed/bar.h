@@ -14,7 +14,7 @@
  * @file        bar.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 23, 2016 6:17 PM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
 #include <ostream>

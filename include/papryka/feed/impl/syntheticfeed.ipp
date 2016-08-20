@@ -14,8 +14,9 @@
  * @file        bartimeseries.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 2, 2016 8:41 PM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */ 
+
 FeedGenerator_::FeedGenerator_(const datetime_t& start, const datetime_t& end, Frequency frequency) :
     start(start),
     end(end),
@@ -26,7 +27,70 @@ FeedGenerator_::FeedGenerator_(const datetime_t& start, const datetime_t& end, F
     log_trace("FeedGenerator_ created");
 }
 
-/*GenericGenerator::GenericGenerator(const datetime_t& start, const datetime_t& end, Frequency frequency) :
+FeedGenerator<float>::FeedGenerator(const datetime_t& start, const datetime_t& end, Frequency frequency) :
+        FeedGenerator_(start, end, frequency) {
+    log_trace("FeedGenerator created");
+}
+
+size_t FeedGenerator<float>::generate(rows_t& rows) 
+{
+    log_trace("FeedGenerator::generate entry");
+    datetime_t date = start;
+    ql::Calendar cal = ql::UnitedStates();
+    size_t counter = 0;
+    while (date <= end && counter++ < maxlen) 
+    {
+        if (cal.isBusinessDay(to_qdate(date))) 
+        {
+            float value = (float)dist(rng);
+            row_t row = row_t(date, value);
+            rows.push_back(row);
+        }
+        date = get_next_timepoint(date, frequency);
+    }
+    log_trace("FeedGenerator::generate exit");
+    return counter;
+}
+
+FeedGenerator<Bar>::FeedGenerator(const datetime_t& start, const datetime_t& end, Frequency frequency) :
+        FeedGenerator_(start, end, frequency) 
+{ log_trace("FeedGenerator created"); }
+
+size_t FeedGenerator<Bar>::generate(rows_t& rows) 
+{
+    log_trace("FeedGenerator::generate entry");
+    datetime_t date = start;
+    ql::Calendar cal = ql::UnitedStates();
+    size_t counter = 0;
+    while (date <= end && counter++ < maxlen) 
+    {
+        if (cal.isBusinessDay(to_qdate(date))) 
+        {
+            std::vector<float> vals;
+            vals.push_back(dist(rng));
+            vals.push_back(dist(rng));
+            vals.push_back(dist(rng));
+            vals.push_back(dist(rng));
+            std::sort(vals.begin(), vals.end());
+
+            value_t value;
+            value.open = vals[1];
+            value.high = vals[3];
+            value.low = vals[0];
+            value.close = vals[2];
+            value.closeadj = dist(rng);
+            value.volume = dist(rng)*1000000;
+            row_t row = row_t(date, value);
+            rows.push_back(row);
+        }
+        date = get_next_timepoint(date, frequency);
+    }
+    log_trace("FeedGenerator::generate exit");
+    return counter;
+}
+
+#if 0
+GenericGenerator::GenericGenerator(const datetime_t& start, const datetime_t& end, Frequency frequency) :
     start(start),
     end(end),
     frequency(frequency),
@@ -56,7 +120,8 @@ size_t GenericGenerator::generate(rows_t& rows)
         date = get_next_timepoint(date, frequency);
     }
     return counter;
-}*/
+}
+#endif
 
 template<typename _T, typename _Generator>
 SyntheticFeed<_T, _Generator>::SyntheticFeed(datetime_t start, const datetime_t& end, Frequency frequency) :

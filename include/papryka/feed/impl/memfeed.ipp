@@ -14,11 +14,11 @@
  * @file        bartimeseries.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 2, 2016 8:41 PM
- * @copyright   2017 www.sequenceresearch.com
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 template<typename _T>
 MemFeed<_T>::MemFeed(size_t maxlen, Frequency frequency) :
-    FeedBase<_T>(maxlen, frequency),
+    Feed<_T>(maxlen, frequency),
     is_started_(false)
 {
     log_debug("MemFeed CREATED");
@@ -38,7 +38,7 @@ bool MemFeed<_T>::add_values(const std::string& name, const rows_t& rows)
     typename map_rows_t::iterator iter = map_rows_.find(name);
     if (iter == map_rows_.end())
     {
-        FeedBase<_T>::register_timeseries(name);
+        Feed<_T>::register_timeseries(name);
         map_rows_.insert(typename map_rows_t::value_type(name, rows));
     }
     else
@@ -69,17 +69,19 @@ void MemFeed<_T>::stop() {
 template<typename _T>
 void MemFeed<_T>::reset() {
     is_started_ = false; 
-    FeedBase<_T>::reset();
+    Feed<_T>::reset();
 }
 
 template<typename _T>
 bool MemFeed<_T>::eof() {
+//    log_trace("MemFeed::eof entry");
     bool ret = true;
     typename map_rows_t::iterator iter;
     for (iter = map_rows_.begin(); iter != map_rows_.end(); ++iter)
     {
         const std::string& name = iter->first;
         rows_t& rows = iter->second;
+//        log_debug("MemFeed::eof symbol={} size={}", name, rows.size());
         size_t next_index = next_indexes_[name];
         if (next_index < rows.size())
         {
@@ -87,6 +89,7 @@ bool MemFeed<_T>::eof() {
             break;
         }
     }
+//    log_trace("MemFeed::eof exit");
     return ret;
 }
 

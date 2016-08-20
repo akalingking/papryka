@@ -14,38 +14,39 @@
  * @file        frequency.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 23, 2016 7:57 PM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
 #include  "../detail/date.h"
 
 namespace papryka {
-    enum Frequency { Day=0, Hour, Minute, Second, Millisecond, Microsecond, Tick };
-    
-    static const char* frequency_str[] { "Day","Hour","Minute","Second","Millisecond","Microsecond","Tick" };
-    
-    static const char* to_str(Frequency e) { return frequency_str[e]; }
-    
-    static datetime_t get_next_timepoint(const datetime_t& datetime, Frequency frequency)
-    {
-        assert (datetime != nulldate);
 
-        switch(frequency) 
-        {
-            case Frequency::Day:
-                return datetime + std::chrono::days(1);
-            case Frequency::Hour:
-                return datetime + std::chrono::hours(1);
-            case Frequency::Minute:
-                return datetime + std::chrono::minutes(1);
-            case Frequency::Second:
-                return datetime + std::chrono::seconds(1);
-            case Frequency::Millisecond:
-                return datetime + std::chrono::milliseconds(1);
-            case Frequency::Microsecond:
-                return datetime + std::chrono::microseconds(1);
-            default:
-                assert (false);
-        }
+enum Frequency { Day=0, Hour, Minute, Second, Millisecond, Microsecond, Tick };
+
+static const char* frequency_str[] { "Day", "Hour", "Minute", "Second", "Millisecond", "Microsecond", "Tick" };
+
+static const char* to_str(Frequency e) { return frequency_str[e]; }
+
+static datetime_t get_next_timepoint(const datetime_t& datetime, Frequency frequency)
+{
+    assert (datetime != nulldate);
+
+    switch(frequency) {
+        case Frequency::Day:
+            return datetime + std::chrono::days(1);
+        case Frequency::Hour:
+            return datetime + std::chrono::hours(1);
+        case Frequency::Minute:
+            return datetime + std::chrono::minutes(1);
+        case Frequency::Second:
+            return datetime + std::chrono::seconds(1);
+        case Frequency::Millisecond:
+            return datetime + std::chrono::milliseconds(1);
+        case Frequency::Microsecond:
+            return datetime + std::chrono::microseconds(1);
+        default:
+            assert (false);
     }
+}
+
 }

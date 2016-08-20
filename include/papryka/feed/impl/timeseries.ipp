@@ -14,7 +14,7 @@
  * @file        timeseries.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 2, 2016 10:42 PM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 template<typename _T, typename _Alloc>
 Timeseries<_T,_Alloc>::Timeseries(size_t maxlen, Frequency frequency, Event* eventSource) : 
@@ -22,11 +22,13 @@ Timeseries<_T,_Alloc>::Timeseries(size_t maxlen, Frequency frequency, Event* eve
 {
     if (eventSource)
         eventSource->subscribe(&Timeseries::on_new_value_, this);
+    log_trace("Timeseries created");
 }
 
 template<typename _T, typename _Alloc>
 Timeseries<_T,_Alloc>::~Timeseries() 
 {
+    log_trace("Timeseries destroyed");
 }
 
 template<typename _T, typename _Alloc>
@@ -48,6 +50,18 @@ void Timeseries<_T,_Alloc>::push_back(const row_t& row)
     {
         throw std::out_of_range("out of range");
     }
+}
+
+template<typename _T, typename _Alloc>
+typename Timeseries<_T,_Alloc>::row_t Timeseries<_T,_Alloc>::pop_front()
+{
+    row_t ret;
+    if (!rows_.empty())
+    {
+         ret = rows_.front();
+         rows_.pop_front();
+    }
+    return ret;
 }
 
 template<typename _T, typename _Alloc>

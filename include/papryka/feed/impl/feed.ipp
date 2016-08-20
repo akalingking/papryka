@@ -14,22 +14,21 @@
  * @file        feed/feed.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 2, 2016 8:41 PM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 template<typename _T>
-FeedBase<_T>::FeedBase(size_t maxLen, Frequency frequency) {
-    Feed::maxlen = maxLen;
-    Feed::frequency = frequency;
-    Feed::date_format = (frequency==Frequency::Day?s_date_format:s_datetime_format);
-    log_trace("FeedBase CREATED");
+Feed<_T>::Feed(size_t maxLen, Frequency frequency) :
+        maxlen(maxLen), frequency(frequency), date_format(frequency==Frequency::Day?s_date_format:s_datetime_format)
+{
+    log_trace("Feed CREATED");
 }
 
 template<typename _T>
-FeedBase<_T>::~FeedBase() {
+Feed<_T>::~Feed() {
 }
 
 template<typename _T>
-void FeedBase<_T>::reset() {
+void Feed<_T>::reset() {
     std::vector<std::string> keys;
     for (typename ts_ptrs_t::value_type& val : ts_ptrs_)
         keys.push_back(val.first);
@@ -41,35 +40,37 @@ void FeedBase<_T>::reset() {
 }
 
 template<typename _T>
-bool FeedBase<_T>::dispatch() {
+bool Feed<_T>::dispatch() {
     
-    log_trace("FeedBase::dispatch entry");
+    log_trace("Feed::{} entry", __func__);
     
-    datetime_t date;
+    datetime_t datetime;
     values_t values;
-    get_next_and_update(date, values);
-    if (date != nulldate) {
-        current_date = date;
+    get_next_and_update(datetime, values);
+    if (datetime != nulldate) 
+    {
+        current_date = datetime;
 #ifdef _DEBUG
         for (const typename values_t::value_type& item : values) {
             std::stringstream strm;
             strm << item.second;
             std::string str = strm.str();
-            log_debug("FeedBase<_T>:{} {} {} {}", __func__, to_str(date), item.first, str);
+            //log_debug("Feed<_T>::{} {} {} {}", __func__, papryka::to_str(datetime), item.first, str);
+            log_debug("Feed<_T>::{}", __func__);
         }
 #endif
-        new_values_event.emit(date, values);
+        new_values_event.emit(datetime, values);
     }
     
-    log_trace("FeedBase::dispatch exit");
+    log_trace("Feed::dispatch exit");
     
     return true;
 }
 
 template<typename _T>
-bool FeedBase<_T>::register_timeseries(const std::string& name) 
+bool Feed<_T>::register_timeseries(const std::string& name) 
 {
-    log_trace("FeedBase::{} entry", __func__);
+    log_trace("Feed::{} entry", __func__);
     
     bool ret = false;
     typename ts_ptrs_t::iterator iter= ts_ptrs_.find(name);
@@ -80,13 +81,13 @@ bool FeedBase<_T>::register_timeseries(const std::string& name)
         ret = true;
     }
     
-    log_trace("FeedBase::{} exit", __func__);
+    log_trace("Feed::{} exit", __func__);
     return ret;
 }
 
 template<typename _T>
-bool FeedBase<_T>::get_next_and_update(datetime_t& date, values_t& values) {
-    log_trace("FeedBase::get_next_and_update entry");    
+bool Feed<_T>::get_next_and_update(datetime_t& date, values_t& values) {
+    log_trace("Feed::get_next_and_update entry");    
     bool ret = false;
     if (get_next(date, values)) {
         current_values = values;
@@ -113,6 +114,6 @@ bool FeedBase<_T>::get_next_and_update(datetime_t& date, values_t& values) {
             }
         }
     }
-    log_trace("FeedBase::get_next_and_update exit");
+    log_trace("Feed::get_next_and_update exit");
     return ret;
 }
