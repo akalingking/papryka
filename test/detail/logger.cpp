@@ -23,6 +23,7 @@ using namespace papryka;
 
 TEST(Detail, logger)
 {
+#if 0
     Logger::logger_t logger = Logger::init("test", "./test.log");
     logger->debug("This is a test");
     logger->debug("{}", "this is a log test");
@@ -44,5 +45,6 @@ TEST(Detail, logger)
     log_debug("this is a log {} will not print", "debug");
 #else
     log_debug("this is a log {} will print", "debug");
+#endif
 #endif
 }
