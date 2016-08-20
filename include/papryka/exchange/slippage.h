@@ -32,34 +32,4 @@ struct NoSlippage
     }
 };
 
-/**
- * A volume share slippage model as defined in Zipline's VolumeShareSlippage model.
- * The slippage is calculated by multiplying the price impact constant by the 
- * square of the ratio of the order to the total volume.
- * Check https://www.quantopian.com/help#ide-slippage for more details.
- */
-//    struct VolumeShareSlippage
-//    {
-//        typedef Bar value_t;
-//        typedef Order<value_t> order_t;
-//        float price_impact;
-//        VolumeShareSlippage(float priceImpact=0.1) : price_impact(priceImpact) {}
-//
-//        float calculate_price(order_t& order, float price, float quantity, const value_t& value, float volumeUsed) 
-//        {
-//            float volume = value.volume;
-//            assert (volume != 0.0);
-//            float total_volume = volumeUsed + quantity;
-//            float volume_share = total_volume / volume;
-//            float impact_pcnt = (volume_share*volume_share)*price_impact;
-//
-//            float ret = 0.0;
-//            if (order.is_buy())
-//                ret = price * (1 + impact_pcnt);
-//            else
-//                ret = price * (1 - impact_pcnt);
-//            
-//            return ret;
-//        }
-//    };
 } // namespace papryka
