@@ -1,18 +1,19 @@
 include ../makefile.ubuntu
-
 LIBS := -lQuantLib
 INCLUDES := -I../include
+	
+TARGET_DIR=../bin
 
 #@{ targets
 SYNTHETIC=synthetic_feed	
-SYNTHETIC_TARGET=../bin/examples/$(SYNTHETIC)
+SYNTHETIC_TARGET=$(TARGET_DIR)/$(SYNTHETIC)
 SYNTHETIC_SRCS=./examples/feed/synthetic.cpp
 SYNTHETIC_OBJS=$(SYNTHETIC_SRCS:.cpp=.o)
 #@} targets
 
-OBJS = $(SYNTHETIC_OBJS) 
-SRCS = $(SYNTHETIC_SRCS)
-TARGETS = $(SYNTHETIC_TARGET) 
+OBJS = $(SANITY_OBJS) $(SYNTHETIC_OBJS) 
+SRCS = $(SANITY_SRCS) $(SYNTHETIC_SRCS)
+TARGETS = $(SANITY_TARGET) $(SYNTHETIC_TARGET) 
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@

@@ -14,11 +14,8 @@
  * @file        synthetic.cpp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 16, 2016 1:01 AM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
-#define SPDLOG_DEBUG_ON
-//#define SPDLOG_TRACE_ON
-
 #include <papryka/papryka.h>
 #include <papryka/feed/syntheticfeed.h>
 #include <iostream>
@@ -33,17 +30,13 @@ int main(int argc, char** argv)
     datetime_t start = to_datetime("2010-01-01");
     datetime_t end 	 = to_datetime("2010-12-31");
     
-    std::shared_ptr<SyntheticFeed<float>> ptr(
-            new SyntheticFeed<float>(start, end, Frequency::Day));
+    std::shared_ptr<SyntheticFeed<float>> ptr(new SyntheticFeed<float>(start, end, Frequency::Day));
     
-    std::vector<std::string> symbols={"QQQ", "AAA", "BBB"};
-
+    std::vector<std::string> symbols = {"QQQ", "AAA", "BBB"};
     ptr->add_values_from_generator(symbols);
     
     Dispatcher dispatcher;
     dispatcher.add_subject(ptr);
     dispatcher.run();
-    
-    std::cin.get();
     return 0;
 }

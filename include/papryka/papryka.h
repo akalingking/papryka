@@ -14,7 +14,7 @@
  * @file        papryka.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 23, 2016 9:38 PM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com> 
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com> 
  */
 #pragma once
 #include "./detail/date.h"
