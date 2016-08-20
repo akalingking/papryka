@@ -36,23 +36,15 @@ namespace std {
 
 namespace papryka {
 namespace detail {
-    //@{ Hack for c++14's integer sequence
-    // http://en.cppreference.com/w/cpp/utility/integer_sequence
-    template <int...I>
-    struct index{};
-
+    template <int...I> struct index{};
     template <int N, int...I>
     struct sequence : sequence<N-1, N-1, I...> {};
-
     template <int... I>
     struct sequence<0, I...> : index<I...> {};
-    //@}
 
-    //@{ http://stackoverflow.com/questions/11709859/how-to-have-static-data-members-in-a-header-only-library
     template <typename _T> struct static_id { static uint32_t value; };
     template <typename _T> uint32_t static_id<_T>::value = 0;
     typedef static_id<void> static_id_t;
-    //@}
 
     struct Action_ : private static_id_t
     {
