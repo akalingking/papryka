@@ -14,10 +14,8 @@
  * @file        logger.cpp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 2, 2016 8:02 PM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
-#define SPDLOG_DEBUG_ON
-#define SPDLOG_TRACE_ON
 #include <gtest/gtest.h>
 #include <papryka/papryka.h>
 
@@ -37,12 +35,12 @@ TEST(Detail, logger)
     console->trace("console trace");
     spdlog::get("console")->debug("test from console using spdlog::get");
 
-#ifndef SPDLOG_TRACE_ON     
+#ifndef PAPRYKA_TRACE_ON     
     log_trace("this is a log {} will not print", "trace");
 #else
     log_trace("this is a log {} will print", "trace");
 #endif
-#ifndef SPDLOG_DEBUG_ON    
+#ifndef PAPRYKA_DEBUG_ON    
     log_debug("this is a log {} will not print", "debug");
 #else
     log_debug("this is a log {} will print", "debug");

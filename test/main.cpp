@@ -14,7 +14,7 @@
  * @file        main.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 2, 2016 11:00 PM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #include <gtest/gtest.h>
 

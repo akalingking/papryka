@@ -14,11 +14,8 @@
  * @file        feed.cpp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 16, 2016 5:13 PM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
-#define SPDLOG_DEBUG_ON
-//#define SPDLOG_TRACE_ON
-
 #include <gtest/gtest.h>
 #include <papryka/detail/date.h>
 #include <papryka/detail/dispatcher.h>
@@ -26,13 +23,12 @@
 
 using namespace papryka;
 
-TEST(Feed, Feed)
+TEST(Feed, FeedFloat)
 {
     datetime_t end = Clock::now();
     datetime_t start = end - std::chrono::days(100);
     
-    std::shared_ptr<SyntheticFeed<Bar>> feed(
-            new SyntheticFeed<Bar>(start, end, Frequency::Day));
+    std::shared_ptr<SyntheticFeed<float>> feed(new SyntheticFeed<float>(start, end, Frequency::Day));
     
     std::vector<std::string> symbols={"GOOG","MSFT"};
     feed->add_values_from_generator(symbols);
@@ -43,4 +39,23 @@ TEST(Feed, Feed)
     
     EXPECT_EQ(0,0);
 }
+
+TEST(Feed, FeedBar)
+{
+    datetime_t end = Clock::now();
+    datetime_t start = end - std::chrono::days(100);
+    
+    std::shared_ptr<SyntheticFeed<Bar>> feed(new SyntheticFeed<Bar>(start, end, Frequency::Day));
+    
+    std::vector<std::string> symbols={"GOOG","MSFT"};
+    feed->add_values_from_generator(symbols);
+    
+    Dispatcher dispatcher;
+    dispatcher.add_subject(feed);
+    dispatcher.run();
+    
+    EXPECT_EQ(0,0);
+}
+
+
 

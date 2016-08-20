@@ -14,7 +14,7 @@
  * @file        date.cpp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 23, 2016 1:19 AM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #include <gtest/gtest.h>
 #include <papryka/detail/date.h>

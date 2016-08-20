@@ -14,10 +14,10 @@
  * @file        timeseries.cpp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
  * @date        July 9, 2016 4:52 PM
- * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
+ * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #include <gtest/gtest.h>
-#include <papryka/detail/date.h>
+#include <papryka/papryka.h>
 #include <papryka/feed/timeseries.h>
  
 using namespace papryka;
