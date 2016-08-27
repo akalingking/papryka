@@ -25,7 +25,7 @@
 namespace papryka {
 namespace detail {
 
-template <typename _T=float> 
+template <typename _T=real_t> 
 class Window
 {   
 public:    

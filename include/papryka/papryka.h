@@ -17,6 +17,7 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com> 
  */
 #pragma once
+#include "detail/types.h"
 #include "./detail/date.h"
 #include "./detail/dispatcher.h"
 #include "./detail/subject.h"

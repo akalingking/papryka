@@ -17,15 +17,16 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com> 
  */
 #pragma once
-#include "detail/window.h"
+#include "../detail/types.h"
 #include "../feed/timeseries.h"
+#include "detail/window.h"
 
 namespace papryka {
 
-class SMA : public detail::Window<float>
+class SMA : public detail::Window<real_t>
 {
 public:
-    typedef float value_t;
+    typedef real_t value_t;
     typedef detail::Window<value_t> base_t;
     typedef Timeseries<value_t> timeseries_t;
     

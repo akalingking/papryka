@@ -17,39 +17,16 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
+#include "../detail/types.h"
 #include "order.h"
 
 namespace papryka {
 
     struct NoCommission {
         template <typename _Order>
-        float calculate(_Order& order, double price, int quantity) {
+        real_t calculate(_Order& order, real_t price, size_t quantity) {
             return 0;
         }
     };
-#if 0
-    /**
-     * Charge commission only on first fill
-     */
-    struct FixedPerTradeCommission
-    {
-        float amount;
-        FixedPerTradeCommission(double amount) : amount(amount) {}
-        float calculate(Order& order, float price, int quantity) {
-            float ret = 0.0;
-            if (order.info == nullptr)
-                ret = amount;
-            return ret;
-        }
-    };
-
-    struct TradePercentageCommission {
-        float percent;
-        TradePercentageCommission(float percent) : percent(percent) {}
-        float calculate(Order& order, float price, int quantity) {
-            return price * quantity * percent;
-        }
-    };
-#endif
 
 } // namespace papryka
