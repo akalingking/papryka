@@ -17,6 +17,7 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
+#include "types.h"
 #include "date.h"
 #include <map>
 #include <vector>
@@ -31,7 +32,7 @@ namespace papryka {
  * @param _T        bar type
  * @param _Alloc    memory allocator
  */
-template <typename _T=float, typename _Alloc=std::allocator<_T>>
+template <typename _T=real_t, typename _Alloc=std::allocator<_T>>
 struct Traits 
 {
     typedef _T value_t;

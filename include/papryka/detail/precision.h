@@ -18,17 +18,18 @@
  */
 #pragma once
 #include <cmath>
+#include <cstddef>
 
 namespace papryka {
 
     template <typename _T>
     _T round_(_T x, int precision)
     {
-        _T ret = 0.0;
+        _T ret = _T(0.0);
         if (precision > 0)
         {
-            _T p = std::pow(10, precision);
-            _T i = std::floor(x * p + 0.5);
+            _T p = _T(std::pow(10, precision));
+            _T i = std::floor(x * p + _T(0.5));
             ret = i / p;
         }
         else
@@ -40,19 +41,14 @@ namespace papryka {
     
     
     struct precision {
-        static const constexpr int s_precision = 3;
-        template<typename _T> static _T round(_T quantity, size_t precision=s_precision)
-        { return round_(quantity, precision); } 
+        static const constexpr int s_precision = 6;
+        template<typename _T> static _T round(_T value, size_t precision=s_precision) { return round_(value, precision); }
     };
 
     struct Precision {
         int precision;
-        Precision(int precision = 3) : precision(precision)
-        {}
-        
-        template<typename _T>
-        _T round(_T quantity)
-        { return round_(quantity, precision); }
+        Precision(int precision=6) : precision(precision) {}
+        template<typename _T> _T round(_T value) { return round_(value, precision); }
     };
 
 } // namespace papryka
