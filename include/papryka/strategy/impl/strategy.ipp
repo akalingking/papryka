@@ -47,8 +47,8 @@ void Strategy::run()
 void Strategy::on_order_updated(order_t* order) 
 {
     datetime_t datetime;
-    float quantity = 0;
-    float price = 0;
+    size_t quantity = 0;
+    real_t price = 0;
     order_info_t* info = order->info.get();
     if (info)
     {
@@ -156,14 +156,14 @@ Strategy::position_t* Strategy::get_position(const uint32_t id)
     return pos;
 }
 
-float Strategy::get_result()
+real_t Strategy::get_result()
 {
     return exchange->get_equity();
 }
 
-float Strategy::get_last_price(const std::string& symbol) const
+real_t Strategy::get_last_price(const std::string& symbol) const
 {
-    float ret = 0.0;
+    real_t ret = real_t(0.0);
     const value_t& value = feed->current_values[symbol];
     ret = value.close;
     return ret;
@@ -174,48 +174,48 @@ const datetime_t& Strategy::get_current_datetime() const
     return feed->current_date;
 }
 
-Strategy::order_ptr_t Strategy::create_order(order_t::Type type, order_t::Action action, const std::string& symbol, int quantity, bool isFillOnClose, float stopPrice, float limitPrice)
+Strategy::order_ptr_t Strategy::create_order(order_t::Type type, order_t::Action action, const std::string& symbol, size_t quantity, bool isFillOnClose, real_t stopPrice, real_t limitPrice)
 {
     return exchange->create_order(type, action, symbol, quantity, isFillOnClose, stopPrice, limitPrice);            
 }
     
-Strategy::position_t* Strategy::enter_long(const std::string& symbol, int quantity, bool isGoodTillCanceled, bool isAllOrNone)
+Strategy::position_t* Strategy::enter_long(const std::string& symbol, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new LongPosition(*this, symbol, 0, 0, quantity, isGoodTillCanceled, isAllOrNone);
+    return new LongPosition(*this, symbol, real_t(0), real_t(0), quantity, isGoodTillCanceled, isAllOrNone);
 }
 
-Strategy::position_t* Strategy::enter_short(const std::string& symbol, int quantity, bool isGoodTillCanceled, bool isAllOrNone)
+Strategy::position_t* Strategy::enter_short(const std::string& symbol, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new ShortPosition(*this, symbol, 0, 0, quantity, isGoodTillCanceled, isAllOrNone);
+    return new ShortPosition(*this, symbol, real_t(0), real_t(0), quantity, isGoodTillCanceled, isAllOrNone);
 }
 
 
-Strategy::position_t* Strategy::enter_long_stop(const std::string& symbol, int quantity, float stopPrice, bool isGoodTillCanceled, bool isAllOrNone)
+Strategy::position_t* Strategy::enter_long_stop(const std::string& symbol, size_t quantity, real_t stopPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new LongPosition(*this, symbol, stopPrice, 0, quantity, isGoodTillCanceled, isAllOrNone);
+    return new LongPosition(*this, symbol, stopPrice, real_t(0), quantity, isGoodTillCanceled, isAllOrNone);
 }
 
-Strategy::position_t* Strategy::enter_short_stop(const std::string& symbol, int quantity, float stopPrice, bool isGoodTillCanceled, bool isAllOrNone)
+Strategy::position_t* Strategy::enter_short_stop(const std::string& symbol, size_t quantity, real_t stopPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new ShortPosition(*this, symbol, stopPrice, 0, quantity, isGoodTillCanceled, isAllOrNone);
+    return new ShortPosition(*this, symbol, stopPrice, real_t(0), quantity, isGoodTillCanceled, isAllOrNone);
 }
    
-Strategy::position_t* Strategy::enter_long_limit(const std::string& symbol, int quantity, float limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
+Strategy::position_t* Strategy::enter_long_limit(const std::string& symbol, size_t quantity, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new LongPosition(*this, symbol, 0, limitPrice, quantity, isGoodTillCanceled, isAllOrNone);
+    return new LongPosition(*this, symbol, real_t(0), limitPrice, quantity, isGoodTillCanceled, isAllOrNone);
 }
 
-Strategy::position_t* Strategy::enter_short_limit(const std::string& symbol, int quantity, float limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
+Strategy::position_t* Strategy::enter_short_limit(const std::string& symbol, size_t quantity, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new ShortPosition(*this, symbol, 0, limitPrice, quantity, isGoodTillCanceled, isAllOrNone);
+    return new ShortPosition(*this, symbol, real_t(0), limitPrice, quantity, isGoodTillCanceled, isAllOrNone);
 }
 
-Strategy::position_t* Strategy::enter_long_stop_limit(const std::string& symbol, int quantity, float stopPrice, float limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
+Strategy::position_t* Strategy::enter_long_stop_limit(const std::string& symbol, size_t quantity, real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
     return new LongPosition(*this, symbol, stopPrice, limitPrice, quantity, isGoodTillCanceled, isAllOrNone);
 }
 
-Strategy::position_t* Strategy::enter_short_stop_limit(const std::string& symbol, int quantity, float stopPrice, float limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
+Strategy::position_t* Strategy::enter_short_stop_limit(const std::string& symbol, size_t quantity, real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
     return new ShortPosition(*this, symbol, stopPrice, limitPrice, quantity, isGoodTillCanceled, isAllOrNone);
 }

@@ -120,7 +120,7 @@ void Strategy::Position::StateMachine::on_order_event(order_event_t& event)
     }
 }
 
-void Strategy::Position::StateMachine::exit(float stopPrice, float limitPrice, bool isGoodTillCanceled)
+void Strategy::Position::StateMachine::exit(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled)
 {
     Strategy& strategy = position.strategy;
     order_ptr_t& entry_order = position.entry_order;

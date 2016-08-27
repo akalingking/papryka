@@ -17,23 +17,23 @@ class Strategy::Position::Tracker
 {
 public:
     Tracker();
-    float get_shares() const { return shares_; }
-    float get_cash() const;
-    float get_cost_basis() const { return cost_basis_; }
-    float get_commissions() const { return commissions_; }
-    float get_net_profit(float price, bool includeCommission=true) const;
-    float get_return(float price, bool includeCommission=true) const;
-    void buy(float quantity, float price, float commission);
-    void sell(float quantity, float price, float commission);
+    real_t get_shares() const { return shares_; }
+    real_t get_cash() const;
+    real_t get_cost_basis() const { return cost_basis_; }
+    real_t get_commissions() const { return commissions_; }
+    real_t get_net_profit(real_t price, bool includeCommission=true) const;
+    real_t get_return(real_t price, bool includeCommission=true) const;
+    void buy(size_t quantity, real_t price, real_t commission);
+    void sell(size_t quantity, real_t price, real_t commission);
     void reset();
         
 private:
-    void update_(float quantity, float price, float commission);
-    float shares_;
-    float cash_;
-    float commissions_;
-    float cost_basis_;
-    float cost_per_share_; // volume weighted ave price per share.
+    void update_(size_t quantity, real_t price, real_t commission);
+    real_t shares_;
+    real_t cash_;
+    real_t commissions_;
+    real_t cost_basis_;
+    real_t cost_per_share_; // volume weighted ave price per share.
 };
 
 Strategy::Position::Tracker::Tracker()
@@ -41,17 +41,17 @@ Strategy::Position::Tracker::Tracker()
 
 void Strategy::Position::Tracker::reset()
 {
-    shares_ = 0;
-    cash_ = 0.0;
-    commissions_ = 0.0;
-    cost_basis_ = 0.0;
-    cost_per_share_ = 0.0;
+    shares_ = real_t(0);
+    cash_ = real_t(0.0);
+    commissions_ = real_t(0.0);
+    cost_basis_ = real_t(0.0);
+    cost_per_share_ = real_t(0.0);
 }
 
-void Strategy::Position::Tracker::update_(float quantity, float price, float commission)
+void Strategy::Position::Tracker::update_(size_t quantity, real_t price, real_t commission)
 {
     assert (quantity != 0);
-    float total_shares = 0;
+    size_t total_shares = 0;
     if (shares_ == 0)
     {
         // Opening new position
@@ -65,8 +65,8 @@ void Strategy::Position::Tracker::update_(float quantity, float price, float com
         if (total_shares != 0)
         {
             // copysign
-            float prev_direction = (shares_ > 0) ? 1.0 :-1.0;
-            float txnDirection = (quantity > 0) ? 1.0 : -1.0;
+            size_t prev_direction = (shares_ > 0) ? 1.0 :-1.0;
+            size_t txnDirection = (quantity > 0) ? 1.0 : -1.0;
             
             if (prev_direction != txnDirection)
             {
@@ -75,7 +75,7 @@ void Strategy::Position::Tracker::update_(float quantity, float price, float com
                     // Going from Long to short or vice versa
                     // Update cost as a new position is being opened.
                     cost_per_share_ = price;
-                    float diff = precision::round(shares_ + quantity);
+                    size_t diff = precision::round(shares_ + quantity);
                     cost_basis_ = abs(diff) * price;
                 }
                 else
@@ -88,8 +88,8 @@ void Strategy::Position::Tracker::update_(float quantity, float price, float com
             {
                 // Increasing the current position
                 // Calculate volume weighted ave price per share
-                float prev_cost = cost_per_share_ * shares_;
-                float txn_cost = quantity * price;
+                size_t prev_cost = cost_per_share_ * shares_;
+                size_t txn_cost = quantity * price;
                 cost_per_share_ = (prev_cost + txn_cost) / total_shares;
                 cost_basis_ += abs(quantity) * price;
             }
@@ -105,14 +105,14 @@ void Strategy::Position::Tracker::update_(float quantity, float price, float com
     shares_ = total_shares;
 }
 
-float Strategy::Position::Tracker::get_cash() const
+real_t Strategy::Position::Tracker::get_cash() const
 {
     return cash_ - commissions_;
 }
 
-float Strategy::Position::Tracker::get_net_profit(float price, bool includeCommission) const
+real_t Strategy::Position::Tracker::get_net_profit(real_t price, bool includeCommission) const
 {
-    float ret = cash_;
+    real_t ret = cash_;
     if (price == 0)
         price = cost_per_share_;
     ret += price * shares_;
@@ -121,22 +121,22 @@ float Strategy::Position::Tracker::get_net_profit(float price, bool includeCommi
     return ret;
 }
 
-float Strategy::Position::Tracker::get_return(float price, bool includeCommission) const
+real_t Strategy::Position::Tracker::get_return(real_t price, bool includeCommission) const
 {
-    float ret = 0.0;
-    float net_profit = get_net_profit(price, includeCommission);
+    real_t ret = 0.0;
+    real_t net_profit = get_net_profit(price, includeCommission);
     if (cost_basis_ != 0)
         ret = net_profit / cost_basis_;
     return ret;
 }
 
-void Strategy::Position::Tracker::buy(float quantity, float price, float commission)
+void Strategy::Position::Tracker::buy(size_t quantity, real_t price, real_t commission)
 {
     assert (quantity > 0);
     this->update_(quantity, price, commission);   
 }
 
-void Strategy::Position::Tracker::sell(float quantity, float price, float commission)
+void Strategy::Position::Tracker::sell(size_t quantity, real_t price, real_t commission)
 {
     assert (quantity > 0);
     update_(quantity*-1.0, price, commission);
@@ -154,7 +154,7 @@ struct Strategy::Position::StateMachine
     bool can_submit_order(order_t& order);
     void on_order_event(order_event_t& event);
     void enter();
-    void exit(float stopPrice, float limitPrice, bool isGoodTillCanceled);
+    void exit(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled);
 };
 #include "statemachine.ipp"
     
@@ -186,7 +186,7 @@ void Strategy::Position::submit_and_register_order(order_ptr_t order)
     active_orders_[order->id] = order;
 }
 
-void Strategy::Position::submit_exit_order(float stopPrice, float limitPrice, bool isGoodTillCanceled)
+void Strategy::Position::submit_exit_order(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled)
 {
     assert (is_entry_active());
     assert (!is_exit_active());
@@ -301,36 +301,36 @@ void Strategy::Position::exit_market(bool goodTillCanceled)
     statemachine_->exit(0, 0, goodTillCanceled);
 }
 
-void Strategy::Position::exit_limit(float limitPrice, bool goodTillCanceled)
+void Strategy::Position::exit_limit(real_t limitPrice, bool goodTillCanceled)
 {
     statemachine_->exit(0, limitPrice, goodTillCanceled);
 }
 
-void Strategy::Position::exit_stop(float stopPrice, bool goodTillCanceled)
+void Strategy::Position::exit_stop(real_t stopPrice, bool goodTillCanceled)
 {
     statemachine_->exit(stopPrice, 0, goodTillCanceled);
 }
 
-void Strategy::Position::exit_stop_limit(float stopPrice, float limitPrice, bool goodTillCanceled)
+void Strategy::Position::exit_stop_limit(real_t stopPrice, real_t limitPrice, bool goodTillCanceled)
 {
     statemachine_->exit(stopPrice, limitPrice, goodTillCanceled);
 }
 
-float Strategy::Position::get_last_price() const
+real_t Strategy::Position::get_last_price() const
 {
-    float ret = 0;
+    real_t ret = 0;
     std::string symbol = get_symbol();
     if (!symbol.empty())
         ret = strategy.feed->current_values[get_symbol()].close;
     return ret;
 }
 
-float Strategy::Position::get_return(bool includeCommission) const
+real_t Strategy::Position::get_return(bool includeCommission) const
 {
     log_trace("Position:{0:} last price {1:0.3f}", __func__, get_last_price());
     
-    float ret = 0;
-    float price = get_last_price();
+    real_t ret = 0;
+    real_t price = get_last_price();
     if (price != 0)
     {
         log_debug("Position::{} from tracker {0.3f}", __func__, tracker_->get_return(price, includeCommission));
@@ -339,10 +339,10 @@ float Strategy::Position::get_return(bool includeCommission) const
     return ret;
 }
 
-float Strategy::Position::get_pnl(bool includeCommission) const
+real_t Strategy::Position::get_pnl(bool includeCommission) const
 {
-    float ret = 0;
-    float price = get_last_price();
+    real_t ret = 0;
+    real_t price = get_last_price();
     if (price != 0)
         ret = tracker_->get_net_profit(price, includeCommission);
     return ret;
@@ -360,7 +360,7 @@ const Milliseconds Strategy::Position::get_age() const
 }
     
     
-LongPosition::LongPosition(Strategy& strategy, const std::string& symbol, float stopPrice, float limitPrice, int quantity,
+LongPosition::LongPosition(Strategy& strategy, const std::string& symbol, real_t stopPrice, real_t limitPrice, size_t quantity,
         bool isGoodTillCanceled, bool isAllOrNone) : Position(strategy, isGoodTillCanceled, isAllOrNone, Position::LongOnly, Market::Stock)
 {
     assert (quantity > 0);
@@ -403,13 +403,13 @@ LongPosition::~LongPosition()
     log_trace("LongPositin::{} id={}", __func__, id);
 }
 
-Strategy::Position::order_ptr_t LongPosition::build_exit_order(float stopPrice, float limitPrice)
+Strategy::Position::order_ptr_t LongPosition::build_exit_order(real_t stopPrice, real_t limitPrice)
 {
     log_debug("LongPosition::{0:} id={1:} stop={2:0.3f} limit={3:0.3f}", __func__, id, stopPrice, limitPrice);
     
     std::string symbol = get_symbol();
     
-    int quantity = shares_;
+    size_t quantity = shares_;
     
     order_ptr_t order;
     if (limitPrice == 0 && stopPrice == 0)
@@ -422,7 +422,7 @@ Strategy::Position::order_ptr_t LongPosition::build_exit_order(float stopPrice, 
     }
     else if (limitPrice == 0 && stopPrice != 0)
     {
-        order = strategy.exchange->create_order(order_t::Stop, order_t::Sell, symbol, quantity, false, 0, stopPrice);
+        order = strategy.exchange->create_order(order_t::Stop, order_t::Sell, symbol, quantity, false, real_t(0), stopPrice);
     }
     else if (limitPrice != 0 && stopPrice != 0)
     {
@@ -434,7 +434,7 @@ Strategy::Position::order_ptr_t LongPosition::build_exit_order(float stopPrice, 
     return order;
 }
 
-ShortPosition::ShortPosition(Strategy& strategy, const std::string& symbol, float stopPrice, float limitPrice, int quantity, bool isGoodTillCanceled, bool isAllOrNone) :
+ShortPosition::ShortPosition(Strategy& strategy, const std::string& symbol, real_t stopPrice, real_t limitPrice, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone) :
     Position(strategy, isGoodTillCanceled, isAllOrNone, Strategy::Position::ShortOnly, Market::Stock)
 {
     if (limitPrice == 0 && stopPrice == 0)
@@ -447,7 +447,7 @@ ShortPosition::ShortPosition(Strategy& strategy, const std::string& symbol, floa
     }
     else if (limitPrice == 0 && stopPrice != 0)
     {
-        entry_order = strategy.exchange->create_order(order_t::Stop, order_t::SellShort, symbol, quantity, false, 0, stopPrice);
+        entry_order = strategy.exchange->create_order(order_t::Stop, order_t::SellShort, symbol, quantity, false,real_t(0), stopPrice);
     }
     else if (limitPrice != 0 && stopPrice != 0)
     {
@@ -472,12 +472,12 @@ ShortPosition::~ShortPosition()
     log_trace("ShortPosition::{} id={}", __func__, id);
 }
 
-Strategy::Position::order_ptr_t ShortPosition::build_exit_order(float stopPrice, float limitPrice)
+Strategy::Position::order_ptr_t ShortPosition::build_exit_order(real_t stopPrice, real_t limitPrice)
 {
     log_trace("ShortPosition::{0:} id={1:} stop={2:0.3f} limit={3:0.3f}", __func__, id, stopPrice, limitPrice);
     
     std::string symbol = get_symbol();
-    int quantity = shares_ * -1;
+    size_t quantity = shares_ * -1;
     
     order_ptr_t order;
     if (limitPrice == 0 && stopPrice == 0)
