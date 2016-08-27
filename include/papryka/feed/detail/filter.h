@@ -17,13 +17,14 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
+#include "../../detail/types.h"
 #include "../../detail/date.h"
 
 namespace papryka {
 namespace detail {
     
 struct RowFilter {
-    typedef std::tuple<datetime_t, float> row_t;
+    typedef std::tuple<datetime_t, real_t> row_t;
     virtual bool include_row(const datetime_t& date, row_t& row) = 0;
 };
 

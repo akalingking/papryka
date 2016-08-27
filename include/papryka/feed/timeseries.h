@@ -17,6 +17,7 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
+#include "../detail/types.h"
 #include "../detail/date.h"
 #include "../detail/event.h"
 #include "../detail/traits.h"
@@ -27,7 +28,7 @@
 
 namespace papryka {
     
-template<typename _T=float, typename _Alloc=std::allocator<_T> >
+template<typename _T=real_t, typename _Alloc=std::allocator<_T> >
 class Timeseries
 {
 public:

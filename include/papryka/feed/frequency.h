@@ -49,4 +49,53 @@ static datetime_t get_next_timepoint(const datetime_t& datetime, Frequency frequ
     }
 }
 
+// will not work unless _Rep and _Duration is supplied in call (e.g. get_duration<type, type>(frequency))
+template <typename _Rep, typename _Duration>
+static auto get_duration(Frequency frequency)->decltype(std::chrono::duration<_Rep, _Duration>()) 
+{
+    switch(frequency) 
+    {
+        case Frequency::Day:
+            return std::chrono::days(1);
+        case Frequency::Hour:
+            return std::chrono::hours(1);
+        case Frequency::Minute:
+            return std::chrono::minutes(1);
+        case Frequency::Second:
+            return std::chrono::seconds(1);
+        case Frequency::Millisecond:
+            return std::chrono::milliseconds(1);
+        case Frequency::Microsecond:
+            return std::chrono::microseconds(1);
+        default:
+            assert (false);
+    }
+}
+
+template<typename _Rep, typename _Period>
+static size_t get_bars_per_day(const std::chrono::duration<_Rep,_Period>& duration)
+{
+    return (size_t)std::chrono::days(1)/duration;
+}
+
+static size_t get_bars_per_day(Frequency frequency)
+{
+    switch(frequency) {
+        case Frequency::Day:
+            return std::chrono::days(1)/std::chrono::days(1);
+        case Frequency::Hour:
+            return std::chrono::days(1)/std::chrono::hours(1);
+        case Frequency::Minute:
+            return std::chrono::days(1)/std::chrono::minutes(1);
+        case Frequency::Second:
+            return std::chrono::days(1)/std::chrono::seconds(1);
+        case Frequency::Millisecond:
+            return std::chrono::days(1)/std::chrono::milliseconds(1);
+        case Frequency::Microsecond:
+            return std::chrono::days(1)/std::chrono::microseconds(1);
+        default:
+            assert (false);
+    }
+}
+
 }

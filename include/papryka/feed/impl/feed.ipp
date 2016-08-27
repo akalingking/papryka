@@ -55,8 +55,7 @@ bool Feed<_T>::dispatch() {
             std::stringstream strm;
             strm << item.second;
             std::string str = strm.str();
-            //log_debug("Feed<_T>::{} {} {} {}", __func__, papryka::to_str(datetime), item.first, str);
-            log_debug("Feed<_T>::{}", __func__);
+            log_debug("Feed<_T>::{} {} {} {}", __func__, papryka::to_str(datetime), item.first, str);
         }
 #endif
         new_values_event.emit(datetime, values);

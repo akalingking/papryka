@@ -17,24 +17,50 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
+#include "../detail/types.h"
 #include <ostream>
 
 namespace papryka {
+    
     struct Bar {
-        Bar(float open=0.0, float high=0.0, float low=0.0, float close=0.0, float volume=0.0) :
-                open(open), high(high), low(low), close(close), volume(volume) {} 
-        float open;
-        float high;
-        float low;
-        float close;
-        float closeadj;
-        float volume;
+        explicit Bar(real_t open=real_t(0.0), real_t high=real_t(0.0), real_t low=real_t(0.0), real_t close=real_t(0.0), real_t volume=real_t(0.0), real_t closeAdj=real_t(0.0)) :
+                open(open), high(high), low(low), close(close), volume(volume), closeadj(closeAdj) 
+        {
+             if (high < low)
+                throw std::logic_error("High < Low");
+            else if (high < open)
+                throw std::logic_error("High < Open");
+            else if (high < close)
+                throw std::logic_error("High < Close");
+            else if (low > open)
+                throw std::logic_error("Low > Open");
+            else if (low > close)
+                throw std::logic_error("Low > Close");
+        } 
+        real_t open;
+        real_t high;
+        real_t low;
+        real_t close;
+        real_t closeadj;
+        real_t volume; 
     };
+    
+    inline real_t adjusted_value(real_t value, real_t close, real_t adjClose) 
+    {
+        if (value ==0) return 0;
+        if (adjClose != 0)
+            return (adjClose * (value/close));
+        else
+            throw std::logic_error("adjclose is 0");
+    }
+    
+    inline real_t typical_price(const Bar& bar) 
+    { 
+        return (bar.high + bar.low + bar.close) / 3;
+    }
 
-#ifdef _DEBUG    
     inline std::ostream& operator<<(std::ostream& os, const Bar& bar) {
-        os << "o:"<<bar.open << " h:" << bar.high << " l:" << bar.low << " c:" << bar.close << " v:" << bar.volume;
+        os << std::fixed << std::setprecision(papryka::precision::s_precision) << "o: " << bar.open << " h:" << bar.high << " l:" << bar.low << " c:" << bar.close  << " v:"  << bar.volume;
         return os;
     }
-#endif
 }

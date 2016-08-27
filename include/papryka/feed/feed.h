@@ -17,6 +17,7 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
+#include "../detail/types.h"
 #include "../detail/date.h"
 #include "../detail/subject.h"
 #include "../detail/logger.h"
@@ -28,7 +29,7 @@
 
 namespace papryka {
 
-template <typename _T=float>
+template <typename _T=real_t>
 class Feed : public Subject
 {
 public:
@@ -62,10 +63,10 @@ private:
 
 /**
  * @brief Memory cached feed
- * @param _T bar type (e.g. float,bar, quotes)
+ * @param _T bar type (e.g. real_t,bar, quotes)
  */
-template <typename _T=float>
-class MemFeed : public Feed<_T>
+template <typename _T=real_t>
+class FeedMem : public Feed<_T>
 {
 public:
     typedef _T value_t;
@@ -75,7 +76,7 @@ public:
     typedef std::map<std::string, size_t> indexes_t;
     typedef std::map<std::string, rows_t> map_rows_t;
 
-    MemFeed(size_t maxlen=1024, Frequency frequency=Frequency::Day);
+    FeedMem(size_t maxlen=1024, Frequency frequency=Frequency::Day);
     bool add_values(const std::string& name, const rows_t& rows);
     bool get_next(datetime_t& date, values_t& values);
     //@{from subject
@@ -94,17 +95,17 @@ private:
 };
 
 template <typename _T>
-class FilterMemFeed : public MemFeed<_T> 
+class FeedMemFilter : public FeedMem<_T> 
 {
 protected:
     std::shared_ptr<detail::RowFilter> filter_;
-    FilterMemFeed(int maxlen, Frequency frequency) : MemFeed<_T>(maxlen, frequency) 
-    { log_trace("FilterMemFeed created"); }    
+    FeedMemFilter(int maxlen, Frequency frequency) : FeedMem<_T>(maxlen, frequency) 
+    { log_trace("FeedMemFilter created"); }    
 public:
     void set_date_range(const datetime_t& from, const datetime_t& to) 
     { filter_.reset(new detail::DateRowFilter(from, to)); }
 };
 
 #include "impl/feed.ipp"
-#include "impl/memfeed.ipp"
+#include "impl/feedmem.ipp"
 }
