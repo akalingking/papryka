@@ -23,6 +23,7 @@
 #include <chrono>
 #include <cmath>
 #include <tuple>
+#include <string.h>
 #include "logger.h"
 #include <ql/time/calendars/unitedstates.hpp>
 
@@ -59,7 +60,8 @@ typedef Timepoint<Days> date_t;
 typedef Timepoint<Nanoseconds> datetime_t;
 // Date formats
 static const char* s_date_format = "%Y-%m-%d";
-static const char* s_datetime_format = "%Y-%m-%d %H:%M:%S.000000";
+static const char* s_datetime_format = "%Y-%m-%d %H:%M:%S";
+static const char* s_datetime_ms_format = "%Y-%m-%d %H:%M:%S.000000";
 static const datetime_t nulldate = datetime_t::clock::from_time_t(0);
 typedef std::vector<datetime_t> datetimes_t;
 
@@ -70,14 +72,14 @@ typedef std::vector<datetime_t> datetimes_t;
  * @param dateFormat
  * @return 
  */
-inline time_t to_time_t(const char* date, const char* dateFormat=s_datetime_format);
+inline time_t to_time_t(const char* date, const char* dateFormat=s_datetime_ms_format);
 /**
  * 
  * @param date
  * @param dateFormat
  * @return 
  */
-inline datetime_t to_datetime(const char* date, const char* dateFormat=s_datetime_format);
+inline datetime_t to_datetime(const char* date, const char* dateFormat=s_datetime_ms_format);
 /**
  * 
  * @param date

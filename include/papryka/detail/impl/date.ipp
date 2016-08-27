@@ -21,9 +21,10 @@ namespace {
     {
         std::time_t current_time;
         std::time(&current_time);
-        struct std::tm timeinfo;
-        timeinfo = *std::localtime(&current_time);
-        return timeinfo.tm_gmtoff;
+        struct std::tm* timeinfo;
+        timeinfo = std::localtime(&current_time);
+        assert (timeinfo);
+        return timeinfo->tm_gmtoff;
     }
     
     bool to_tm(struct tm& tm, const datetime_t& datetime, const char* tz=nullptr)
@@ -78,24 +79,43 @@ namespace {
  */
 time_t to_time_t(const char* date, const char* dateFormat)
 {
-    static char buff[30];
-    memset(&buff, '\0', 30);
+    //log_trace("date::{} date:'{}' format:'{}'", __func__, date, dateFormat);
     struct tm tm_;
     memset(&tm_, '\0', sizeof(struct tm));
     strptime(date, dateFormat, &tm_);
-    // Tell mktime to figure out the daylight saving time
-    tm_.tm_isdst = -1;
+    // Tell mktime to figure out the daylight saving time by setting to -1
+    // however, tm_.tm_isdst = -1 is unreliable and does not work for american time.
+    tm_.tm_isdst = 1;
     time_t t_ = mktime(&tm_); 
     // mktime localtime, get offset to get gmtime
     time_t offset = get_utc_offset();
-    //std::cout << offset << std::endl;
+    //log_debug("offset hr={}", offset);
     t_ += offset;
     return t_;
 }
  
 datetime_t to_datetime(const char* date, const char* dateFormat)
 {
-    return Clock::from_time_t(to_time_t(date, dateFormat));
+    // time_t only handles up to second resolution
+    datetime_t datetime =  Clock::from_time_t(to_time_t(date, dateFormat));
+    // check if we have ms format
+    if (strstr(dateFormat, "%S.") != nullptr) 
+    {
+        char sz[10];
+        memset(&sz, '\0', 10);        
+        const char* value = strchr(date, '.');
+        if (value != nullptr) 
+        {
+            // obtain length of the millisecond string
+            std::size_t len = strlen(date) - (value - date);
+            // copy past the point
+            strncpy(sz, value + 1, len - 1);
+            Milliseconds ms = std::chrono::milliseconds(std::atoi(sz));
+            datetime += ms;
+            //log_debug("date::{} {} len {}", __func__, sz, strlen(date) - (value - date));
+        }
+    }
+    return datetime;
 }
 
 date_t to_date(const char* date, const char* dateFormat)
@@ -127,23 +147,24 @@ const char* to_str(const date_t& date, const char* dateFormat)
 const char* to_str(const datetime_t& datetime, const char* dateFormat, const char* tz)
 {   
     static const size_t date_max_len = 25;
+    static const size_t datetosec_len = date_max_len - 3;
     static char szdate[date_max_len];
-    memset(szdate, '\0', 20);
+    memset(szdate, '\0', date_max_len);
     
-    time_t t; 
-
+    std::time_t t;
     struct tm tm_;
     if (tz==nullptr || !strcmp(tz, "UTC"))
     {
-        t = std::chrono::duration_cast<Seconds>(datetime.time_since_epoch()).count();
+        Seconds seconds = std::chrono::duration_cast<Seconds>(datetime.time_since_epoch());
+        t = seconds.count();
         tm_ = *std::gmtime(&t);
-        std::strftime(szdate, 20, dateFormat, &tm_);
+        std::strftime(szdate, datetosec_len, papryka::s_datetime_format, &tm_);
     }
     else if (!strcmp(tz, "LOCALTIME"))
     {
         t = std::chrono::duration_cast<Seconds>(datetime.time_since_epoch()).count();
         tm_ = *std::localtime(&t);
-        std::strftime(szdate, 20, dateFormat, &tm_);
+        std::strftime(szdate, datetosec_len, s_datetime_format, &tm_);
     }
     else
     {
@@ -161,7 +182,7 @@ const char* to_str(const datetime_t& datetime, const char* dateFormat, const cha
         if (offset != 0 && getenv("TZ") != nullptr)
         {
             tm_ = *std::localtime(&t);
-            std::strftime(szdate, 20, dateFormat, &tm_);
+            std::strftime(szdate, datetosec_len, s_datetime_format, &tm_);
         }
         else
         {
@@ -175,20 +196,24 @@ const char* to_str(const datetime_t& datetime, const char* dateFormat, const cha
         
         tzset();
     }
-    
-    // make ms default for datetime printing
-    //if (std::string(dateFormat).find("%S.000") != std::string::npos)
-    if (std::string(dateFormat).find("%S") != std::string::npos)
+    //log_debug("date::{} format={} szdate='{}'", __func__, dateFormat, szdate);
+    // todo: make ms default for datetime printing
+    //if (std::string(dateFormat).find("%S.") != std::string::npos)
+    if (strstr(dateFormat, "%S.") != nullptr)
     {
         // include millisecond timestamp
-        Milliseconds ms = std::chrono::duration_cast<Milliseconds>(datetime.time_since_epoch());
+        // returns clock smallest resolution (nanosecond)
+        Clock::duration duration = datetime.time_since_epoch();
+        // cast to ms
+        Milliseconds ms = std::chrono::duration_cast<Milliseconds>(duration);
+        // obtain the fractional seconds to print
         size_t fractional_seconds = ms.count() % 1000;
         std::string s_ms = std::to_string(fractional_seconds);
         s_ms = "." + s_ms;
         assert (strlen(szdate)+ s_ms.size() <= date_max_len);
         strcat(szdate, s_ms.c_str());
     }
-    
+    //log_debug("date::{} (exit) szdate='{}'", __func__, szdate);
     return szdate;
 }
 
@@ -382,7 +407,7 @@ std::tm utc_tm(std::chrono::time_point<std::chrono::system_clock, Duration> tp)
 
 qdatetime_t to_qdate(const datetime_t datetime)
 {
-    time_t tt = to_time_t(to_str(datetime), s_datetime_format);
+    time_t tt = to_time_t(to_str(datetime), s_datetime_ms_format);
     struct tm local_tm= *std::localtime(&tt);
     return qdatetime_t(local_tm.tm_mday, (ql::Month)((int)local_tm.tm_mon+1), local_tm.tm_year+1900);
 }

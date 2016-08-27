@@ -18,7 +18,7 @@
  */
 template<typename _T>
 Feed<_T>::Feed(size_t maxLen, Frequency frequency) :
-        maxlen(maxLen), frequency(frequency), date_format(frequency==Frequency::Day?s_date_format:s_datetime_format)
+        maxlen(maxLen), frequency(frequency), date_format(frequency==Frequency::Day?s_date_format:s_datetime_ms_format)
 {
     log_trace("Feed CREATED");
 }

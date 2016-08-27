@@ -23,3 +23,4 @@
 #include "./detail/subject.h"
 #include "./detail/event.h"
 #include "./detail/logger.h"
+#include "./detail/string.h"

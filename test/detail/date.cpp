@@ -17,14 +17,36 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #include <gtest/gtest.h>
-#include <papryka/detail/date.h>
-#include <papryka/detail/logger.h>
+#include <papryka/papryka.h>
  
 using namespace papryka;
 
 TEST(detail, date)
 {
     datetime_t date = Clock::now();
-    std::cout << "date " << to_str(date) << std::endl;
+    log_debug("current date='{}' ", to_str(date));
 }
 
+TEST(detail, dateString)
+{
+    std::string strdate = "2000-11-03";
+    date_t date = to_date(strdate.c_str(), s_date_format);
+    log_debug("exp={} date={}", strdate, to_str(date));
+    EXPECT_TRUE(!string::compare(strdate.c_str(), to_str(date)));
+}
+
+TEST(detail, datetimeString)
+{
+    std::string strdatetime = "2000-11-03 10:20:30";
+    datetime_t datetime = to_datetime(strdatetime.c_str(), s_datetime_format);
+    log_debug("exp='{}' datetime='{}'", strdatetime, to_str(datetime, s_datetime_format));
+    EXPECT_TRUE(!string::compare(strdatetime.c_str(), to_str(datetime, s_datetime_format)));
+}
+
+TEST(detail, datetimeMsString)
+{
+    std::string strdatetime = "2000-11-03 10:20:30.500";
+    datetime_t datetime = to_datetime(strdatetime.c_str(), s_datetime_ms_format);
+    log_debug("exp='{}' datetime='{}'", strdatetime, to_str(datetime, s_datetime_ms_format));
+    EXPECT_TRUE(!string::compare(strdatetime.c_str(), to_str(datetime, s_datetime_ms_format)));
+}

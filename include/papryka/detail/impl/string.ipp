@@ -35,7 +35,6 @@ std::string &trim(std::string &s)
         return ltrim(rtrim(s));
 }
 
-
 void tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters)
 {
     // Skip delimiters at beginning.
@@ -68,4 +67,14 @@ void tolower(std::string& str)
 {
     for (size_t i=0; i < str.length(); ++i)
         str[i] = std::toupper(str[i]);
+}
+
+size_t compare(const char* lhs, const char* rhs, size_t n)
+{
+    return (n) ? strncmp(lhs, rhs, n) : strcmp(lhs, rhs);
+}
+
+size_t compare_no_case(const char* lhs, const char* rhs, size_t n)
+{
+    return (n) ? strncasecmp(lhs, rhs, n) : strcasecmp(lhs, rhs);
 }

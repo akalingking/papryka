@@ -18,6 +18,7 @@
  */
 #pragma once
 #include <string>
+#include <cstring>
 
 namespace papryka {
 namespace string {
@@ -34,4 +35,9 @@ static void toupper(std::string& str);
 
 static void tolower(std::string& str);
 
+static size_t compare(const char* lhs, const char* rhs, size_t n=0);
+
+static size_t compare_no_case(const char* lhs, const char* rhs, size_t n=0);
+
+#include "impl/string.ipp"
 }}

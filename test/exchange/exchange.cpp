@@ -32,12 +32,12 @@ TEST(Exchange, Exchange)
     
     std::shared_ptr<feed_t> feed(new feed_t(start, end, Frequency::Day));
     
-    Bar goog_start_value(771,773,770,772,1350000);
-    Bar msft_start_value(59,61,58,60,15000000);
+    Bar goog_spot(771,773,770,772,1350000);
+    Bar msft_spot(59,61,58,60,15000000);
     feed_t::data_t data = {
-        // symbol, spot, volatility, exp profit
-        {"GOOG", goog_start_value, 0.2, 0.1}, 
-        {"MSFT", msft_start_value, 0.2, 0.1}};
+        // symbol, spot, volatility, exp return
+        {"GOOG", goog_spot, 0.2, 0.1}, 
+        {"MSFT", msft_spot, 0.2, 0.1}};
     
     feed->add_values_from_generator(data);
 

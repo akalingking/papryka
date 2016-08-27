@@ -35,3 +35,12 @@ TEST(Bar, basicConstruction)
     EXPECT_THROW(Bar(2,4,5,3), std::logic_error);
     EXPECT_THROW(Bar(2,1,3,3), std::logic_error);
 }
+
+TEST(Bar, testInvalidConstruction)
+{
+    EXPECT_THROW(Bar(2.0, 1.0, 1.0, 1.0, 1.0, 1.0), std::logic_error);
+    EXPECT_THROW(Bar(1.0, 1.0, 1.0, 2.0, 1.0, 1.0), std::logic_error);
+    EXPECT_THROW(Bar(1.0, 2.0, 1.5, 1.0, 1.0, 1.0), std::logic_error);
+    EXPECT_THROW(Bar(2.0, 2.0, 1.5, 1.0, 1.0, 1.0), std::logic_error);
+    EXPECT_THROW(Bar(1.0, 1.0, 1.5, 1.0, 1.0, 1.0), std::logic_error);
+}
