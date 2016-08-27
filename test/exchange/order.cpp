@@ -17,10 +17,10 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #include <gtest/gtest.h>
+#include <papryka/papryka.h>
 #include <papryka/feed/bar.h>
 #include <papryka/exchange/order.h>
 #include <papryka/exchange/detail/filltype.h>
-#include <papryka/detail/logger.h>
  
 using namespace papryka;
 
@@ -31,24 +31,24 @@ TEST(Exchange, Order)
     typedef Order<fill_t> order_t;
     typedef typename fill_t::info_ptr_t fill_info_ptr_t;
     
-    order_t order(order_t::Market, order_t::Buy, "GOOG", 1);
+    order_t order(order_t::Market, order_t::Buy, "GOOG", real_t(1.0));
     fill_t fill;
     
     // create bars
     datetime_t datetime = datetime_t::clock::now();
-    Bar bar(2, 4, 1, 3, 100);
+    Bar bar(real_t(2), real_t(4), real_t(1), real_t(3), real_t(100));
     values_t values;
     values.insert(values_t::value_type("GOOG", bar));
     
     fill.on_bars(datetime, values);
-    float vol = fill.get_volume_left("GOOG");
-    log_debug("volume left {0:0.3f}", vol);
-    EXPECT_EQ(vol, 100*.25);
+    real_t vol = fill.get_volume_left("GOOG");
+//    log_debug("volume left {0:0.3f}", vol);
+    EXPECT_EQ(vol, real_t(100*.25));
     
     log_debug("Sample state string {}", order_t::to_str(order_t::Initial));
     
     fill_info_ptr_t ptr = order.process(fill, bar);
-    log_debug("fill info price={0:0.3f} qty={1:0.3f}", ptr->price, ptr->quantity);
+    log_debug("fill info price={0:(precision::s_format)f} qty={1:(precision::s_format)f}", ptr->price, ptr->quantity);
     EXPECT_EQ(ptr->price, 2);
     EXPECT_EQ(ptr->quantity, 1);
 }

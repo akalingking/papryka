@@ -18,9 +18,11 @@
  */
 #include <gtest/gtest.h>
 #include <papryka/detail/date.h>
+#include <papryka/detail/logger.h>
  
 using namespace papryka;
-TEST(Detail, date)
+
+TEST(detail, date)
 {
     datetime_t date = Clock::now();
     std::cout << "date " << to_str(date) << std::endl;

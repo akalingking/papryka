@@ -17,19 +17,29 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #include <gtest/gtest.h>
+#include <papryka/papryka.h>
 #include <papryka/exchange/exchange.h>
-#include <papryka/feed/syntheticfeed.h>
-#include <papryka/detail/dispatcher.h>
+#include <papryka/feed/feedsynthetic.h>
+
 using namespace papryka;
 
 TEST(Exchange, Exchange)
 {
+    typedef FeedSynthetic<Bar> feed_t;
+    
     datetime_t end = Clock::now();
     datetime_t start = end - std::chrono::days(100);
-    std::shared_ptr<SyntheticFeed<Bar>> feed(new SyntheticFeed<Bar>(start, end, Frequency::Day));
     
-    std::vector<std::string> symbols={"GOOG","MSFT"};
-    feed->add_values_from_generator(symbols);
+    std::shared_ptr<feed_t> feed(new feed_t(start, end, Frequency::Day));
+    
+    Bar goog_start_value(771,773,770,772,1350000);
+    Bar msft_start_value(59,61,58,60,15000000);
+    feed_t::data_t data = {
+        // symbol, spot, volatility, exp profit
+        {"GOOG", goog_start_value, 0.2, 0.1}, 
+        {"MSFT", msft_start_value, 0.2, 0.1}};
+    
+    feed->add_values_from_generator(data);
 
     Exchange exchange(feed, 1000);
     

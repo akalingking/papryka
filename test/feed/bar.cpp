@@ -18,10 +18,12 @@
  */
 #include <gtest/gtest.h>
 #include <papryka/detail/date.h>
+#include <papryka/feed/frequency.h>
 #include <papryka/feed/bar.h>
  
 using namespace papryka;
-TEST(Feed, bar)
+
+TEST(Bar, basicConstruction)
 {
     Bar bar(2,4,1,3);
 
@@ -32,16 +34,4 @@ TEST(Feed, bar)
 
     EXPECT_THROW(Bar(2,4,5,3), std::logic_error);
     EXPECT_THROW(Bar(2,1,3,3), std::logic_error);
-
-//     typedef Timeseries<float> timeseries_t;
-//     timeseries_t::row_t row;
-//     timeseries_t ts(Frequency::Day);
-//     row = timeseries_t::row_t(Clock::now(), 1.0);
-//     ts.push_back(row);
-//     EXPECT_EQ(std::get<1>(ts[0]), 1.0);
-//     
-//     row = timeseries_t::row_t(Clock::now(), 3.0);
-//     ts.push_back(row);
-//     const timeseries_t::row_t& row2 = ts[1];
-//     EXPECT_EQ(std::get<1>(row2), 3.0);
 }

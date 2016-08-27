@@ -24,15 +24,15 @@ using namespace papryka;
 
 TEST(Feed, timeseries)
 {
-    typedef Timeseries<float> timeseries_t;
+    typedef Timeseries<real_t> timeseries_t;
     timeseries_t::row_t row;
     timeseries_t ts(Frequency::Day);
-    row = timeseries_t::row_t(Clock::now(), 1.0);
+    row = timeseries_t::row_t(Clock::now(), real_t(1.0));
     ts.push_back(row);
-    EXPECT_EQ(std::get<1>(ts[0]), 1.0);
+    EXPECT_EQ(std::get<1>(ts[0]), real_t(1.0));
 
-    row = timeseries_t::row_t(Clock::now(), 3.0);
+    row = timeseries_t::row_t(Clock::now(), real_t(3.0));
     ts.push_back(row);
     const timeseries_t::row_t& row2 = ts[1];
-    EXPECT_EQ(std::get<1>(row2), 3.0);
+    EXPECT_EQ(std::get<1>(row2), real_t(3.0));
 }

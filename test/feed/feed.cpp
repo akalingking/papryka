@@ -19,7 +19,7 @@
 #include <gtest/gtest.h>
 #include <papryka/detail/date.h>
 #include <papryka/detail/dispatcher.h>
-#include <papryka/feed/syntheticfeed.h>
+#include <papryka/feed/feedsynthetic.h>
 
 using namespace papryka;
 
@@ -28,10 +28,13 @@ TEST(Feed, FeedFloat)
     datetime_t end = Clock::now();
     datetime_t start = end - std::chrono::days(100);
     
-    std::shared_ptr<SyntheticFeed<float>> feed(new SyntheticFeed<float>(start, end, Frequency::Day));
-    
-    std::vector<std::string> symbols={"GOOG","MSFT"};
-    feed->add_values_from_generator(symbols);
+    typedef FeedSynthetic<real_t> feed_t;
+    std::shared_ptr<feed_t> feed(new feed_t(start, end, Frequency::Day));
+    feed_t::data_t data = {
+        {"GOOG", 770, 0.2, 0.1}, 
+        {"MSFT", 60, 0.2, 0.1},
+        {"QQQ", 117, 0.2, 0.1}};
+    feed->add_values_from_generator(data);
     
     Dispatcher dispatcher;
     dispatcher.add_subject(feed);
@@ -41,14 +44,24 @@ TEST(Feed, FeedFloat)
 }
 
 TEST(Feed, FeedBar)
-{
+{ 
     datetime_t end = Clock::now();
     datetime_t start = end - std::chrono::days(100);
     
-    std::shared_ptr<SyntheticFeed<Bar>> feed(new SyntheticFeed<Bar>(start, end, Frequency::Day));
+    typedef FeedSynthetic<Bar> feed_t;
+    std::shared_ptr<feed_t> feed(new feed_t(start, end, Frequency::Day));
     
-    std::vector<std::string> symbols={"GOOG","MSFT"};
-    feed->add_values_from_generator(symbols);
+    Bar goog_start_value(771,773,770,772,1350000);
+    Bar msft_start_value(59,61,58,60,15000000);
+    Bar qqq_start_value(116,118,115,117,17360000);
+    
+    feed_t::data_t data = {
+        // symbol, spot, volatility, exp profit
+        {"GOOG", goog_start_value, 0.2, 0.1}, 
+        {"MSFT", msft_start_value, 0.2, 0.1},
+        {"QQQ", qqq_start_value, 0.2, 0.1}};
+    
+    feed->add_values_from_generator(data);
     
     Dispatcher dispatcher;
     dispatcher.add_subject(feed);
@@ -56,6 +69,3 @@ TEST(Feed, FeedBar)
     
     EXPECT_EQ(0,0);
 }
-
-
-

@@ -7,8 +7,9 @@ Status: Pre-Alpha
 
 FEATURES:
 * Trading system platform (Backtest Only)
-* Low latency support, uses template meta programming. Components replaceable with custom objects (e.g. memory allocator)
-* Header only, to use just copy header directory and start building strategies you want to validate, see the test files for examples.
+* Header only, uses template meta programming 
+* Components replaceable with custom objects (e.g. bar data type, memory allocator)
+* To use just copy header directory and start building strategies you want to validate, see test files for reference.
 
 
 REQUIREMENTS:

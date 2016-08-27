@@ -19,7 +19,7 @@
 #include <gtest/gtest.h>
 #include <papryka/papryka.h>
 #include <papryka/exchange/exchange.h>
-#include <papryka/feed/syntheticfeed.h>
+#include <papryka/feed/feedsynthetic.h>
 #include <papryka/strategy/strategy.h>
 #include <exception>
 #include <string>
@@ -59,13 +59,15 @@ TEST(Strategy, Strategy)
     std::string symbol = "GOOG";
     datetime_t end = Clock::now();
     datetime_t start = end - std::chrono::days(100);
-    std::shared_ptr<SyntheticFeed<Bar>> feed(new SyntheticFeed<Bar>(start, end, Frequency::Day));
-
-    Strategy::symbols_t symbols;
-    symbols.push_back(symbol);
-    feed->add_values_from_generator(symbols);
+    
+    typedef FeedSynthetic<Bar> feed_t;
+    std::shared_ptr<feed_t> feed(new feed_t(start, end, Frequency::Day));
+    Bar goog_spot(771,773,770,772,1350000);
+    feed_t::data_t data = {{"GOOG", goog_spot, 0.2, 0.1}};
+    feed->add_values_from_generator(data);
+    
     Exchange::ptr_t exchange(new Exchange(feed, 1000));
-
-    MyStrategy strategy(exchange, symbol);
+   
+    MyStrategy strategy(exchange, symbol); 
     strategy.run();
 }

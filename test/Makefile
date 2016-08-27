@@ -16,15 +16,15 @@ DETAIL_OBJS=$(DETAIL_SRCS:.cpp=.o)
 FEED=test_feed	
 FEED_TARGET=$(TARGETDIR)/$(FEED)
 FEED_SRCS=./main.cpp \
-    ./feed/timeseries.cpp \
-    ./feed/bar.cpp \
-    ./feed/feed.cpp
+./feed/bar.cpp \
+./feed/timeseries.cpp \
+./feed/feed.cpp
 FEED_OBJS = $(FEED_SRCS:.cpp=.o)
 
 EXCHANGE=test_exchange	
 EXCHANGE_TARGET=$(TARGETDIR)/$(EXCHANGE)
 EXCHANGE_SRCS=./main.cpp \
-    ./exchange/fillstrategy.cpp \
+    ./exchange/filltype.cpp \
     ./exchange/order.cpp \
     ./exchange/exchange.cpp
 EXCHANGE_OBJS = $(EXCHANGE_SRCS:.cpp=.o)
@@ -35,18 +35,9 @@ STRATEGY_SRCS=./main.cpp \
     ./strategy/strategy.cpp
 STRATEGY_OBJS = $(STRATEGY_SRCS:.cpp=.o)
 
-#@{ math	
-GBM=test_gbm	
-GBM_TARGET=$(TARGETDIR)/$(GBM)
-GBM_SRCS=\
-    ./feed/gbm.cpp
-GBM_OBJS = $(GBM_SRCS:.cpp=.o)
-#@} math
-#@} targets
-
 OBJS = $(SANITY_OBJS) $(DETAIL_OBJS) $(FEED_OBJS) $(EXCHANGE_OBJS) $(STRATEGY_OBJS) $(GBM_OBJS) 
 SRCS = $(SANITY_SRCS) $(DETAIL_SRCS) $(FEED_SRCS) $(EXCHANGE_SRCS) $(STRATEGY_SRCS) $(GBM_SRCS)
-TARGETS = $(SANITY_TARGET) $(DETAIL_TARGET) $(FEED_TARGET) $(EXCHANGE_TARGET) $(STRATEGY_TARGET) $(GBM_TARGET) 
+TARGETS = $(SANITY_TARGET) $(DETAIL_TARGET) $(FEED_TARGET) $(EXCHANGE_TARGET) $(STRATEGY_TARGET) 
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
@@ -79,12 +70,6 @@ $(EXCHANGE): $(EXCHANGE_TARGET)
 $(STRATEGY_TARGET): $(STRATEGY_OBJS) 
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(STRATEGY_TARGET) $(STRATEGY_OBJS) $(LFLAGS) $(LIBS)
 $(STRATEGY): $(STRATEGY_TARGET)
-	
-#@{math
-$(GBM_TARGET): $(GBM_OBJS) 
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(GBM_TARGET) $(GBM_OBJS) $(LFLAGS) $(LIBS) -lQuantLib
-$(GBM): $(GBM_TARGET)
-#@} math
 #@} builds
 	
 # DO NOT DELETE
