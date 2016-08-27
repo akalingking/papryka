@@ -30,13 +30,13 @@ struct Order::Info
     enum Error { ErrorNone=0, OrderCanceled = 1 };
     static const char* to_str(Error error) { return order_names_t::errors[error]; }
     
-    float price;
-    float quantity;
-    float commission;
+    real_t price;
+    size_t quantity;
+    real_t commission;
     datetime_t datetime;
     Error error;
 
-    Info(float price, float quantity, float commission, const datetime_t& datetime) :
+    Info(real_t price, size_t quantity, real_t commission, const datetime_t& datetime) :
             price(price), quantity(quantity), commission(commission), datetime(datetime), error(ErrorNone)
     { log_trace("order::info created"); }
     ~Info() 
@@ -63,7 +63,7 @@ struct Order::Event
     { log_trace("Order::Event destroyed {}", to_str(type)); }
 };
 
-Order::Order(Type type, Action action, const std::string& symbol, int quantity) :
+Order::Order(Type type, Action action, const std::string& symbol, size_t quantity) :
         id(0), type(type), action(action), symbol(symbol), quantity(quantity), state(Initial),
         filled(0), avg_fill_price(0.0), is_all_or_none(false), is_good_till_canceled(false), commissions(0.0)
 {
@@ -125,26 +125,26 @@ void Order::add_info(info_ptr_t& info)
     if (info->quantity > get_remaining())
     {
         std::stringstream strm;
-        strm << "Order" << "::" << __func__ << "Invalid fill size "
-            << get_remaining() << " and " << info->quantity << " filled" << std::endl;
+//        strm << "Order" << "::" << __func__ << "Invalid fill size "
+//            << get_remaining() << " and " << info->quantity << " filled" << std::endl;
 
         std::string str(strm.str());
         log_error(str.c_str());
         throw std::logic_error(str);
     }
 
-    if (avg_fill_price == 0)
+    if (avg_fill_price == real_t(0.0))
         avg_fill_price = info->price;
     else
         avg_fill_price = ((avg_fill_price * filled)
-        + (info->price * info->quantity)) / ((filled + info->quantity) * 1.0);
+        + (info->price * info->quantity)) / ((filled + info->quantity) * real_t(1.0));
 
     this->info = info;
     filled += precision::round(info->quantity);
 
     commissions += info->commission;
 
-    if (get_remaining() == 0)
+    if (get_remaining() == real_t(0.0))
     {
         switch_state(Filled);
     }

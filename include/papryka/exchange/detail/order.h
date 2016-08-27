@@ -17,6 +17,7 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
+#include "../../detail/types.h"
 #include "../../detail/date.h"
 #include "../../detail/precision.h"
 #include "../../detail/logger.h"
@@ -71,20 +72,20 @@ namespace detail {
         Action action;
         State state;
         std::string symbol;
-        float quantity;
+        size_t quantity;
         info_ptr_t info;
         bool is_good_till_canceled;
         bool is_all_or_none;
-        double commissions;
+        real_t commissions;
         datetime_t accepted_date;
         datetime_t submitted_date;
         uint32_t id;
-        float filled;
-        float avg_fill_price;
+        real_t filled;
+        real_t avg_fill_price;
         
         inline void set_submitted(uint32_t id, const datetime_t& datetime);
         inline void switch_state(State newState);
-        inline float get_remaining() const { return quantity - filled;  }
+        inline size_t get_remaining() const { return quantity - filled;  }
         inline void add_info(info_ptr_t& info);
         
         bool is_buy() const { return action == Buy || action == BuyToCover; }
@@ -98,7 +99,7 @@ namespace detail {
         bool is_filled() const { return state == State::Filled; }
 
     protected:
-        inline Order(Type type, Action action, const std::string& symbol, int quantity);
+        inline Order(Type type, Action action, const std::string& symbol, size_t quantity);
         
     private:
         inline size_t get_valid_states(State state, std::set<State>& next_states) const;

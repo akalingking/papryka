@@ -17,6 +17,7 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
+#include "../../detail/types.h"
 #include "../../detail/precision.h"
 #include "../../detail/event.h"
 #include "../../exchange/order.h"
@@ -44,7 +45,7 @@ public:
     typedef std::shared_ptr<order_t> order_ptr_t;
     typedef Order::event_ptr_t event_ptr_t;
     typedef Order::info_ptr_t info_ptr_t;
-    typedef std::map<std::string, float> shares_t;
+    typedef std::map<std::string, size_t> shares_t;
     typedef std::map<uint32_t, order_ptr_t> orders_t;
 
     feed_ptr_t feed;
@@ -55,12 +56,12 @@ public:
     bool use_adj_values;
     bool allow_fractions;
     bool allow_negative_cash;
-    float cash;
+    real_t cash;
     Precision precision_;
     
 protected:
     orders_t orders_;
-    Exchange(feed_ptr_t feed, float cash);
+    Exchange(feed_ptr_t feed, real_t cash);
     void on_bars(const datetime_t& datetime, const values_t& values);
     bool register_order(order_ptr_t order);
     void unregister_order(uint32_t id);

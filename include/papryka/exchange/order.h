@@ -17,6 +17,7 @@
  * @copyright   2017 www.sequenceresearch.com
  */
 #pragma once
+#include "../detail/types.h"
 #include "../feed/bar.h"
 #include "../detail/date.h"
 #include "../detail/precision.h"
@@ -48,10 +49,10 @@ public:
     bool is_fill_on_close;
     bool is_limit_hit;
     bool is_stop_hit;
-    float stop_price;
-    float limit_price;
+    real_t stop_price;
+    real_t limit_price;
     
-    explicit Order(base_t::Type type, base_t::Action action, const std::string& symbol, int quantity, bool isFillOnClose=false, float limitPrice=0.0, float stopPrice=0.0);
+    explicit Order(base_t::Type type, base_t::Action action, const std::string& symbol, size_t quantity, bool isFillOnClose=false, real_t limitPrice=real_t(0.0), real_t stopPrice=real_t(0.0));
     fill_info_ptr_t process(fill_t& fill, const value_t& value);
 };
 

@@ -35,15 +35,15 @@ namespace detail {
 struct FillTrigger 
 {
     typedef Traits<Bar>::value_t value_t;
-    inline float get_stop_price_trigger(Order::Action action, float stopPrice, bool useAdjValues, const value_t& value);
-    inline float get_limit_price_trigger(Order::Action action, float limitPrice, bool useAdjValues, const value_t& value);
+    inline real_t get_stop_price_trigger(Order::Action action, real_t stopPrice, bool useAdjValues, const value_t& value);
+    inline real_t get_limit_price_trigger(Order::Action action, real_t limitPrice, bool useAdjValues, const value_t& value);
 };
 
 struct FillInfo 
 {
-    FillInfo(float price, float quantity) : price(price), quantity(quantity) {}
-    float price;
-    float quantity;
+    FillInfo(real_t price, size_t quantity) : price(price), quantity(quantity) {}
+    real_t price;
+    size_t quantity;
 };
 
 /**
@@ -67,12 +67,12 @@ public:
     typedef NoSlippage slippage_t;
     typedef FillInfo info_t;
     typedef std::shared_ptr<info_t> info_ptr_t;
-    typedef std::map<std::string, float> volumes_t;
+    typedef std::map<std::string, real_t> volumes_t;
     Frequency frequency;
 
-    inline FillType(Frequency frequency = Frequency::Day, float volumeLimit = 0.25);
+    inline FillType(Frequency frequency = Frequency::Day, real_t volumeLimit = real_t(0.25));
     inline void on_bars(const datetime_t& date, const values_t& values);
-    inline float get_volume_left(const std::string& symbol);
+    inline real_t get_volume_left(const std::string& symbol);
 
     template <typename _Order>
     void on_order_filled(_Order& order);
@@ -91,12 +91,12 @@ public:
 
 private:    
     slippage_t slippage_;
-    float volume_limit_;
+    real_t volume_limit_;
     volumes_t volume_left_;
     volumes_t volume_used_;
     
     template <typename _Order>
-    float calculate_fill_size_(_Order& order, const value_t& bar);
+    real_t calculate_fill_size_(_Order& order, const value_t& bar);
 };
 
 #include "impl/filltype.ipp"

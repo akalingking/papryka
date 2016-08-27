@@ -1,6 +1,6 @@
 template <typename _U> uint32_t  Exchange::order_id<_U>::value = 0;
 
-Exchange::Exchange(feed_ptr_t feed, float cash) : base_t(feed, cash) 
+Exchange::Exchange(feed_ptr_t feed, real_t cash) : base_t(feed, cash) 
 {
     log_debug("Exchange created");
 }
@@ -52,8 +52,8 @@ bool Exchange::cancel_order(uint32_t id) {
     return ret;
 }
 
-float Exchange::get_equity() {
-    float ret = cash;         
+real_t Exchange::get_equity() {
+    real_t ret = cash;         
     const values_t& values = feed->current_values;
     for (const shares_t::value_type& share : shares) {
         values_t::const_iterator iter = values.find(share.first);
@@ -65,7 +65,7 @@ float Exchange::get_equity() {
     return ret;
 }
 
-Exchange::order_ptr_t Exchange::create_order(order_t::Type type, order_t::Action action, const std::string& symbol, int quantity, bool isFillOnClose, float limitPrice, float stopPrice) 
+Exchange::order_ptr_t Exchange::create_order(order_t::Type type, order_t::Action action, const std::string& symbol, size_t quantity, bool isFillOnClose, real_t limitPrice, real_t stopPrice) 
 {
     return order_ptr_t(new order_t(type, action, symbol, quantity, isFillOnClose, limitPrice, stopPrice));
 }

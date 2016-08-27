@@ -36,11 +36,11 @@ public:
     typedef typename base_t::order_t order_t;
     typedef typename base_t::order_ptr_t order_ptr_t;
 
-    Exchange(feed_ptr_t feed, float cash);
+    Exchange(feed_ptr_t feed, real_t cash);
     bool submit_order(order_ptr_t order);
     bool cancel_order(uint32_t id);
-    float get_equity();
-    order_ptr_t create_order(order_t::Type type, order_t::Action action, const std::string& symbol, int quantity, bool isFillOnClose=false, float stopPrice=0, float limitPrice=0);
+    real_t get_equity();
+    order_ptr_t create_order(order_t::Type type, order_t::Action action, const std::string& symbol, size_t quantity, bool isFillOnClose=false, real_t stopPrice=real_t(0), real_t limitPrice=real_t(0));
 
 private:
     template <typename _U> struct order_id { static uint32_t value; };

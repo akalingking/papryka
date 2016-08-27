@@ -17,6 +17,7 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
+#include "../detail/types.h"
 #include "../feed/bar.h"
 #include <cassert>
 
@@ -26,7 +27,7 @@ struct NoSlippage
 {
 
     template <typename _Order, typename _T>
-    float calculate_price(_Order& order, const _T& value, float price, float quantity, float volumeUsed)
+    real_t calculate_price(_Order& order, const _T& value, real_t price, size_t quantity, real_t volumeUsed)
     {
         return price;
     }

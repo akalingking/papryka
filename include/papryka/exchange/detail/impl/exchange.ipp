@@ -1,6 +1,6 @@
 
 template <typename _T, typename _Fill, typename _Commission>
-Exchange<_T, _Fill, _Commission>::Exchange(feed_ptr_t feed, float cash) :
+Exchange<_T, _Fill, _Commission>::Exchange(feed_ptr_t feed, real_t cash) :
     feed(feed), cash(cash), fillstrategy(feed->frequency)
 {
     feed->new_values_event.subscribe(&Exchange<_T, _Fill, _Commission>::on_bars, this);
@@ -140,26 +140,26 @@ bool Exchange<_T, _Fill, _Commission>::commit_order_execution(const datetime_t& 
             __func__, papryka::to_str(datetime), order->id, order->quantity, order->filled, fill->quantity);
 
     bool ret = false;
-    float price = fill->price;
-    float quantity = fill->quantity;
-    float cost = 0.0;
-    float shares_delta = 0;
+    real_t price = fill->price;
+    size_t quantity = fill->quantity;
+    real_t cost = real_t(0.0);
+    size_t shares_delta = size_t(0.0);
     const std::string& symbol = order->symbol;
 
     if (order->is_buy())
     {
-        cost = price * quantity * -1.0;
+        cost = price * quantity * real_t(-1.0);
         shares_delta = quantity;
     }
     else if (order->is_sell())
     {
         cost = price * quantity;
-        shares_delta = quantity * -1.0;
+        shares_delta = quantity * real_t(-1.0);
     }
 
-    float commission = this->commission.calculate(*order, price, quantity);
+    real_t commission = this->commission.calculate(*order, price, quantity);
     cost -= commission;
-    float resulting_cash = this->cash + cost;
+    real_t resulting_cash = this->cash + cost;
 
     // Check cash after commission
     if (resulting_cash >= 0 || allow_negative_cash)
@@ -170,7 +170,7 @@ bool Exchange<_T, _Fill, _Commission>::commit_order_execution(const datetime_t& 
 
         this->cash = resulting_cash;
 
-        float updated_shares = precision_.round(shares[symbol] + shares_delta);
+        size_t updated_shares = precision_.round(shares[symbol] + shares_delta);
 
         if (updated_shares == 0)
             shares.erase(symbol);
@@ -197,7 +197,7 @@ bool Exchange<_T, _Fill, _Commission>::commit_order_execution(const datetime_t& 
     else
     {
         log_error("Exchange::{} order id={} not enough cash to fill {} share(s) shares, cash={0.3f}, needed={0.3f}",
-            __func__, order->id, quantity, cash, resulting_cash * -1.0);
+            __func__, order->id, quantity, cash, resulting_cash * real_t(-1.0));
     }
     return ret;
 }

@@ -1,6 +1,6 @@
 
 template <typename _Fill>
-Order<_Fill>::Order(base_t::Type type, base_t::Action action, const std::string& symbol, int quantity, bool isFillOnClose, float limitPrice, float stopPrice) :
+Order<_Fill>::Order(base_t::Type type, base_t::Action action, const std::string& symbol, size_t quantity, bool isFillOnClose, real_t limitPrice, real_t stopPrice) :
         base_t(type, action, symbol, quantity), is_fill_on_close(isFillOnClose), limit_price(limitPrice), stop_price(stopPrice)
 {
 
