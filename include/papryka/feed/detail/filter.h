@@ -22,29 +22,24 @@
 
 namespace papryka {
 namespace detail {
-    
-struct RowFilter {
-    typedef std::tuple<datetime_t, real_t> row_t;
-    virtual bool include_row(const datetime_t& date, row_t& row) = 0;
-};
 
 template <typename _T>
-struct RowFilter_ : RowFilter 
-{
-    bool include_row(const datetime_t& datetime, row_t& row) {
-        return static_cast<_T&>(*this).include_row(datetime, row);
-    }
+struct RowFilter {
+    typedef std::tuple<datetime_t, _T> row_t;
+    virtual bool include_row(const datetime_t& date, const _T& row) = 0;
 };
 
-struct DateRowFilter : RowFilter_<DateRowFilter>
+template<typename _T>
+struct DateRowFilter : RowFilter<_T>
 {
+    typedef typename RowFilter<_T>::row_t row_t;
     datetime_t from_date;
     datetime_t to_date;
 
     DateRowFilter(const datetime_t& fromDate, const datetime_t& toDate) :
             from_date(fromDate), to_date(toDate) {}
 
-    bool include_row(const datetime_t& datetime, row_t& row) {
+    bool include_row(const datetime_t& datetime, const _T& row) {
         bool ret = true;
         if (datetime > to_date)
             ret = false;

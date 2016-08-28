@@ -27,7 +27,7 @@
 #include <memory>
 #include <map>
 
-namespace papryka {
+namespace papryka { 
 
 template <typename _T=real_t>
 class Feed : public Subject
@@ -46,13 +46,13 @@ public:
     std::string date_format;
     size_t maxlen;
     Frequency frequency;
-
-    Feed(size_t maxlen, Frequency frequency);
+    bool is_closeadj_on;
     virtual ~Feed();
     bool dispatch();
     virtual void reset();
 
 protected:
+    Feed(Frequency frequency, size_t maxlen);
     bool register_timeseries(const std::string& name);
     virtual bool get_next(datetime_t& date, values_t& vals) = 0;
 
@@ -76,7 +76,7 @@ public:
     typedef std::map<std::string, size_t> indexes_t;
     typedef std::map<std::string, rows_t> map_rows_t;
 
-    FeedMem(size_t maxlen=1024, Frequency frequency=Frequency::Day);
+    FeedMem(Frequency frequency=Frequency::Day, size_t maxlen=s_timeseries_max_len);
     bool add_values(const std::string& name, const rows_t& rows);
     bool get_next(datetime_t& date, values_t& values);
     //@{from subject
@@ -98,12 +98,12 @@ template <typename _T>
 class FeedMemFilter : public FeedMem<_T> 
 {
 protected:
-    std::shared_ptr<detail::RowFilter> filter_;
-    FeedMemFilter(int maxlen, Frequency frequency) : FeedMem<_T>(maxlen, frequency) 
+    std::shared_ptr<detail::RowFilter<_T>> row_filter_;
+    FeedMemFilter(Frequency frequency, size_t maxlen) : FeedMem<_T>(frequency, maxlen) 
     { log_trace("FeedMemFilter created"); }    
 public:
     void set_date_range(const datetime_t& from, const datetime_t& to) 
-    { filter_.reset(new detail::DateRowFilter(from, to)); }
+    { row_filter_.reset(new detail::DateRowFilter<_T>(from, to)); }
 };
 
 #include "impl/feed.ipp"

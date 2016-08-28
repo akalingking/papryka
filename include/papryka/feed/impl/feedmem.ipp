@@ -17,11 +17,10 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 template<typename _T>
-FeedMem<_T>::FeedMem(size_t maxlen, Frequency frequency) :
-    Feed<_T>(maxlen, frequency),
-    is_started_(false)
+FeedMem<_T>::FeedMem(Frequency frequency, size_t maxlen) :
+        Feed<_T>(frequency, maxlen), is_started_(false)
 {
-    log_debug("FeedMem CREATED");
+    
 }
 
 template<typename _T>

@@ -27,6 +27,8 @@
 #include <exception>
 
 namespace papryka {
+
+static const constexpr size_t s_timeseries_max_len = 1024*20;
     
 template<typename _T=real_t, typename _Alloc=std::allocator<_T> >
 class Timeseries
@@ -42,7 +44,7 @@ public:
     Event event_new_value;
     size_t maxlen;
 
-    Timeseries(size_t max=1024, Frequency frequency=Frequency::Day, Event* eventSource=nullptr);
+    Timeseries(Frequency frequency=Frequency::Day, size_t maxlen=s_timeseries_max_len, Event* eventSource=nullptr);
     ~Timeseries();
     size_t size() const;
     void clear();

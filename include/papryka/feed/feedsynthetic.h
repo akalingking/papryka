@@ -43,7 +43,7 @@ struct GeneratorBase
     Frequency frequency;
     
 protected:
-    GeneratorBase(const datetime_t& start, const datetime_t& end, Frequency frequency=Frequency::Day) :
+    inline GeneratorBase(const datetime_t& start, const datetime_t& end, Frequency frequency=Frequency::Day) :
             start(start), end(end), frequency(frequency) {}
 };
 
@@ -54,8 +54,8 @@ protected:
     typedef std::uniform_real_distribution<double> dist_t;
     std::default_random_engine rng;
     dist_t dist;
-    static const constexpr size_t maxlen=1024;
-    Generator_(const datetime_t& start, const datetime_t& end, Frequency frequency);
+//    static const constexpr size_t maxlen=1024;
+    inline Generator_(const datetime_t& start, const datetime_t& end, Frequency frequency);
 };
 
 template <typename _T> 
@@ -132,7 +132,7 @@ public:
     typedef FeedMemFilter<_T> base_t;
     typedef typename Traits<_T>::rows_t rows_t;
     typedef std::vector<Data> data_t;
-    FeedSynthetic(datetime_t start, const datetime_t& end, Frequency frequency);
+    FeedSynthetic(datetime_t start, const datetime_t& end, Frequency frequency=Frequency::Day, size_t maxlen=1024);
     void add_values_from_generator(const data_t& data);
 
 private:

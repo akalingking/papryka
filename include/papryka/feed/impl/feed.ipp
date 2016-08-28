@@ -17,18 +17,21 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 template<typename _T>
-Feed<_T>::Feed(size_t maxLen, Frequency frequency) :
-        maxlen(maxLen), frequency(frequency), date_format(frequency==Frequency::Day?s_date_format:s_datetime_ms_format)
+Feed<_T>::Feed(Frequency frequency, size_t maxLen) :
+        maxlen(maxLen), frequency(frequency), date_format(frequency==Frequency::Day?s_date_format:s_datetime_ms_format), is_closeadj_on(false)
 {
-    log_trace("Feed CREATED");
+    log_trace("Feed<_T>::{}", __func__);
 }
 
 template<typename _T>
-Feed<_T>::~Feed() {
+Feed<_T>::~Feed() 
+{ 
+    log_trace("Feed<_T>::{}", __func__);
 }
 
 template<typename _T>
-void Feed<_T>::reset() {
+void Feed<_T>::reset() 
+{
     std::vector<std::string> keys;
     for (typename ts_ptrs_t::value_type& val : ts_ptrs_)
         keys.push_back(val.first);
@@ -40,9 +43,10 @@ void Feed<_T>::reset() {
 }
 
 template<typename _T>
-bool Feed<_T>::dispatch() {
+bool Feed<_T>::dispatch() 
+{
     
-    log_trace("Feed::{} entry", __func__);
+    log_trace("Feed<_T::{} (entry)", __func__);
     
     datetime_t datetime;
     values_t values;
@@ -61,7 +65,7 @@ bool Feed<_T>::dispatch() {
         new_values_event.emit(datetime, values);
     }
     
-    log_trace("Feed::dispatch exit");
+    log_trace("Feed<_T>::{} (exit)", __func__);
     
     return true;
 }
@@ -69,38 +73,45 @@ bool Feed<_T>::dispatch() {
 template<typename _T>
 bool Feed<_T>::register_timeseries(const std::string& name) 
 {
-    log_trace("Feed::{} entry", __func__);
+    log_trace("Feed<_T>::{} (entry)", __func__);
     
     bool ret = false;
     typename ts_ptrs_t::iterator iter= ts_ptrs_.find(name);
     if (iter == ts_ptrs_.end()) 
     {
-        ts_ptr_t ptr(new ts_t(maxlen, frequency));
+        ts_ptr_t ptr(new ts_t(frequency, maxlen));
         ts_ptrs_.insert(typename ts_ptrs_t::value_type(name, ptr));
         ret = true;
     }
     
-    log_trace("Feed::{} exit", __func__);
+    log_trace("Feed<_T>::{} (exit)", __func__);
     return ret;
 }
 
 template<typename _T>
-bool Feed<_T>::get_next_and_update(datetime_t& date, values_t& values) {
-    log_trace("Feed::get_next_and_update entry");    
+bool Feed<_T>::get_next_and_update(datetime_t& date, values_t& values) 
+{
+    log_trace("Feed<_T>::{} (entry)", __func__);    
     bool ret = false;
-    if (get_next(date, values)) {
+    if (get_next(date, values)) 
+    {
         current_values = values;
-        if (date != nulldate) {
+        if (date != nulldate) 
+        {
             typename values_t::iterator iter = values.begin();
-            for (;iter != values.end(); ++iter) {
+            for (;iter != values.end(); ++iter) 
+            {
                 const std::string& symbol = iter->first;
                 const value_t& value = iter->second;
                 ts_t* ts = nullptr;
                 
                 typename ts_ptrs_t::iterator iter = ts_ptrs_.find(symbol);
-                if (iter != ts_ptrs_.end()) {
+                if (iter != ts_ptrs_.end()) 
+                {
                     ts = iter->second.get();    
-                } else {
+                } 
+                else 
+                {
                     // timeseries is not registered, silently accept.
                     register_timeseries(symbol);
                     iter = ts_ptrs_.find(symbol);
@@ -113,6 +124,6 @@ bool Feed<_T>::get_next_and_update(datetime_t& date, values_t& values) {
             }
         }
     }
-    log_trace("Feed::get_next_and_update exit");
+    log_trace("Feed<_T>::{} (exit)", __func__);
     return ret;
 }

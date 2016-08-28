@@ -164,8 +164,8 @@ size_t GbmGenerator<Bar>::generate(rows_t& rows)
 //@} Geometric Brownian Motion Generator
 
 template<typename _T, typename _Generator>
-FeedSynthetic<_T, _Generator>::FeedSynthetic(datetime_t start, const datetime_t& end, Frequency frequency) :
-        base_t(1024, frequency), start_(start), end_(end)
+FeedSynthetic<_T, _Generator>::FeedSynthetic(datetime_t start, const datetime_t& end, Frequency frequency, size_t maxlen) :
+        base_t(frequency, maxlen), start_(start), end_(end)
 {
     log_trace("FeedSynthetic created");
 }

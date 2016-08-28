@@ -17,18 +17,18 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 template<typename _T, typename _Alloc>
-Timeseries<_T,_Alloc>::Timeseries(size_t maxlen, Frequency frequency, Event* eventSource) : 
+Timeseries<_T,_Alloc>::Timeseries(Frequency frequency, size_t maxlen, Event* eventSource) : 
     frequency(frequency), maxlen(maxlen) 
 {
     if (eventSource)
         eventSource->subscribe(&Timeseries::on_new_value_, this);
-    log_trace("Timeseries created");
+    log_trace("Timeseries<_T>::{} max={}", __func__, maxlen);
 }
 
 template<typename _T, typename _Alloc>
 Timeseries<_T,_Alloc>::~Timeseries() 
 {
-    log_trace("Timeseries destroyed");
+    log_trace("Timeseries<_T>::{} size={}", __func__, rows_.size());
 }
 
 template<typename _T, typename _Alloc>
@@ -48,7 +48,12 @@ void Timeseries<_T,_Alloc>::push_back(const row_t& row)
     } 
     else 
     {
-        throw std::out_of_range("out of range");
+        std::string error("max size error, ");
+        error += std::to_string(rows_.size());
+        error += " > ";
+        error += std::to_string(maxlen);
+        //throw std::out_of_range("max range");
+        throw std::out_of_range(error);
     }
 }
 

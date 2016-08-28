@@ -25,11 +25,24 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <assert>
+#include <cassert>
 
 namespace papryka {
 
-template<typename _T> class FeedCsv;
+template<typename _T=real_t> 
+class FeedCsv: public FeedMemFilter<_T>
+{
+public:
+    typedef _T value_t;
+    typedef FeedMemFilter<value_t> base_t;
+    typedef typename Traits<value_t>::row_t row_t;
+    typedef typename Traits<value_t>::rows_t rows_t;
+    std::string date_column;
+    std::string date_format;
+    const char delimiter;
+    inline FeedCsv(const std::string& dateColumn="Date", const std::string& dateFormat=s_datetime_format, const char delimiter=',', Frequency frequency=Frequency::Day, size_t maxLen=s_timeseries_max_len);
+    inline void add_values_from_csv(const std::string& symbol, const std::string& filename);
+};
 
 template<>
 class FeedCsv<Bar> : public FeedMemFilter<Bar> 
@@ -37,12 +50,14 @@ class FeedCsv<Bar> : public FeedMemFilter<Bar>
 public:
     typedef Bar value_t;
     typedef FeedMemFilter<value_t> base_t;
+    typedef typename Traits<value_t>::row_t row_t;
     typedef typename Traits<value_t>::rows_t rows_t;
     std::string date_column;
     std::string date_format;
     const char delimiter;
     
-    inline FeedCsv(const std::string& dateColumn="Date", const std::string& dateFormat="%Y-%m-%d", const char delimiter=',', size_t maxLen=1024, Frequency frequency=Frequency::Day);
+    inline FeedCsv(const std::string& dateColumn="Date", const std::string& dateFormat=s_datetime_format, const char delimiter=',', 
+            Frequency frequency=Frequency::Day, size_t maxLen=s_timeseries_max_len);
     
     inline void add_values_from_csv(const std::string& symbol, const std::string& filename);
 };
