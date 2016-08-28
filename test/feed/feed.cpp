@@ -23,7 +23,7 @@
 
 using namespace papryka;
 
-TEST(Feed, FeedFloat)
+TEST(Feed, Float)
 {
     datetime_t end = Clock::now();
     datetime_t start = end - std::chrono::days(100);
@@ -43,7 +43,7 @@ TEST(Feed, FeedFloat)
     EXPECT_EQ(0,0);
 }
 
-TEST(Feed, FeedBar)
+TEST(Feed, Bar)
 { 
     datetime_t end = Clock::now();
     datetime_t start = end - std::chrono::days(100);
