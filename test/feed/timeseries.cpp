@@ -29,7 +29,6 @@ TEST(Feed, timeseries)
     timeseries_t ts(Frequency::Day);
     row = timeseries_t::row_t(Clock::now(), real_t(1.0));
     ts.push_back(row);
-    log_trace("done");
 
     row = timeseries_t::row_t(Clock::now(), real_t(3.0));
     ts.push_back(row);
