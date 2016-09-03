@@ -23,8 +23,8 @@
 namespace papryka {
     
     struct Bar {
-        explicit Bar(real_t open=real_t(0.0), real_t high=real_t(0.0), real_t low=real_t(0.0), real_t close=real_t(0.0), real_t volume=real_t(0.0), real_t closeAdj=real_t(0.0)) :
-                open(open), high(high), low(low), close(close), volume(volume), closeadj(closeAdj) 
+        explicit Bar(real_t open=real_t(0.0), real_t high=real_t(0.0), real_t low=real_t(0.0), real_t close=real_t(0.0), real_t closeAdj=real_t(0.0), real_t volume=real_t(0.0)) :
+                open(open), high(high), low(low), close(close), closeadj(closeAdj), volume(volume)  
         {
              if (high < low)
                 throw std::logic_error("High < Low");
@@ -45,7 +45,7 @@ namespace papryka {
         real_t volume; 
     };
     
-    inline real_t adjusted_value(real_t value, real_t close, real_t adjClose) 
+    inline real_t get_adjusted(real_t value, real_t close, real_t adjClose) 
     {
         if (value ==0) return 0;
         if (adjClose != 0)
@@ -54,7 +54,7 @@ namespace papryka {
             throw std::logic_error("adjclose is 0");
     }
     
-    inline real_t typical_price(const Bar& bar) 
+    inline real_t get_typical_price(const Bar& bar) 
     { 
         return (bar.high + bar.low + bar.close) / 3;
     }

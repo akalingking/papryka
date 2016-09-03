@@ -64,19 +64,20 @@ public:
     // used by analyzers and plots for observing incoming bars/values
     Event bars_processed_event;
     
-    Strategy(exchange_ptr_t& exchange);
-    real_t get_result();
-    real_t get_last_price(const std::string& symbol) const;
-    const datetime_t& get_current_datetime() const;
-    position_t* get_position(const uint32_t id);
-    void run();
+    inline explicit Strategy(exchange_ptr_t& exchange);
+    inline real_t get_result();
+    inline real_t get_last_price(const std::string& symbol) const;
+    inline const datetime_t& get_current_datetime() const;
+    inline position_t* get_position(const uint32_t id);
+    inline void run();
     
     // to be called only by position and derived classes
-    void register_position(position_ptr_t pos);
-    void unregister_position(uint32_t id);
-    void register_position_order(uint32_t posId, uint32_t orderId);
-    void unregister_position_order(uint32_t posId, uint32_t orderId);
-    order_ptr_t create_order(order_t::Type type, order_t::Action action, const std::string& symbol, size_t quantity, bool isGoodTillCanceled=false, real_t stopPrice=real_t(0), real_t limitPrice=real_t(0));
+    inline void register_position(position_ptr_t pos);
+    inline void unregister_position(uint32_t id);
+    inline void register_position_order(uint32_t posId, uint32_t orderId);
+    inline void unregister_position_order(uint32_t posId, uint32_t orderId);
+    inline order_ptr_t create_order(order_t::Type type, order_t::Action action, const std::string& symbol, size_t quantity, 
+            bool isGoodTillCanceled=false, real_t stopPrice=real_t(0), real_t limitPrice=real_t(0));
     // arrg needs to write this as many, interface for custom strategies
     inline position_t* enter_long(const std::string& symbol, size_t quantity, bool isGoodTillCanceled=false, bool isAllOrNone=false);
     inline position_t* enter_short(const std::string& symbol, size_t quantity, bool isGoodTillCanceled=false, bool isAllOrNone=false);
@@ -102,12 +103,12 @@ protected:
     virtual void on_start() {}
     virtual void on_idle() {}
     virtual void on_stop() {}
-    virtual void on_order_updated(order_t* order);
+    inline virtual void on_order_updated(order_t* order);
     virtual void on_bars(const datetime_t& date, const values_t& bars) = 0;
     
 private:
-    void on_order_event_(exchange_t& exchange, order_event_ptr_t orderEvent);
-    void on_bars_(const datetime_t& date, const values_t& bars);
+    inline void on_order_event_(exchange_t& exchange, order_event_ptr_t orderEvent);
+    inline void on_bars_(const datetime_t& date, const values_t& bars);
     void on_start_() { on_start(); };
     void on_idle_() { on_idle(); };
     void on_stop_() { on_stop(); };
@@ -158,28 +159,28 @@ public:
     bool is_all_or_none;
     bool is_good_till_canceled;
 
-    virtual ~Position();
-    const std::string& get_symbol() const;
-    const Milliseconds get_age() const;
-    real_t get_return(bool includeCommission = true) const;
-    real_t get_pnl(bool includeCommission = true) const;
-    real_t get_last_price() const;
+    inline virtual ~Position();
+    inline const std::string& get_symbol() const;
+    inline const Milliseconds get_age() const;
+    inline real_t get_return(bool includeCommission = true) const;
+    inline real_t get_pnl(bool includeCommission = true) const;
+    inline real_t get_last_price() const;
     
-    bool is_entry_active() const;
-    bool is_entry_filled() const;
-    bool is_exit_active() const;
-    bool is_exit_filled() const;
-    bool is_open() const;
-    void cancel_entry();
-    void cancel_exit();
-    void exit_market(bool isGoodTillCanceled = false);
-    void exit_limit(real_t limitPrice, bool isGoodTillCanceled = false);
-    void exit_stop(real_t stopPrice, bool isGoodTillCanceled = false);
-    void exit_stop_limit(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled = false);
+    inline bool is_entry_active() const;
+    inline bool is_entry_filled() const;
+    inline bool is_exit_active() const;
+    inline bool is_exit_filled() const;
+    inline bool is_open() const;
+    inline void cancel_entry();
+    inline void cancel_exit();
+    inline void exit_market(bool isGoodTillCanceled = false);
+    inline void exit_limit(real_t limitPrice, bool isGoodTillCanceled = false);
+    inline void exit_stop(real_t stopPrice, bool isGoodTillCanceled = false);
+    inline void exit_stop_limit(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled = false);
     
-    void submit_exit_order(real_t stopPrice, real_t limitPrice, bool getGoodTillCancelled);
-    void submit_and_register_order(order_ptr_t order);
-    void on_order_event(order_event_ptr_t orderEvent);
+    inline void submit_exit_order(real_t stopPrice, real_t limitPrice, bool getGoodTillCancelled);
+    inline void submit_and_register_order(order_ptr_t order);
+    inline void on_order_event(order_event_ptr_t orderEvent);
 
 protected:
     orders_t active_orders_;
@@ -187,8 +188,8 @@ protected:
     std::unique_ptr<StateMachine> statemachine_;
     real_t shares_;
     
-    Position(Strategy& strategy, bool goodTillCanceled, bool isAllOrNone, Direction direction, Market::Type type = Market::Stock);    
-    void update_pos_tracker(order_event_t& orderEvent);
+    inline Position(Strategy& strategy, bool goodTillCanceled, bool isAllOrNone, Direction direction, Market::Type type = Market::Stock);    
+    inline void update_pos_tracker(order_event_t& orderEvent);
     virtual order_ptr_t build_exit_order(real_t stopPrice, real_t limitPrice) = 0;
     
 private:
@@ -198,17 +199,17 @@ private:
 class LongPosition : public Strategy::Position
 {
 public:
-    LongPosition(Strategy& strategy, const std::string& symbol, real_t stopPrice, real_t limitPrice, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone);
-    ~LongPosition();
-    order_ptr_t build_exit_order(real_t stopPrice, real_t limitPrice);
+    inline LongPosition(Strategy& strategy, const std::string& symbol, real_t stopPrice, real_t limitPrice, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone);
+    inline ~LongPosition();
+    inline order_ptr_t build_exit_order(real_t stopPrice, real_t limitPrice);
 };
 
 class ShortPosition : public Strategy::Position
 {
 public:
-    ShortPosition(Strategy& strategy, const std::string& symbol,real_t stopPrice, real_t limitPrice, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone);
-    ~ShortPosition();
-    order_ptr_t build_exit_order(real_t stopPrice, real_t limitPrice);
+    inline ShortPosition(Strategy& strategy, const std::string& symbol,real_t stopPrice, real_t limitPrice, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone);
+    inline ~ShortPosition();
+    inline order_ptr_t build_exit_order(real_t stopPrice, real_t limitPrice);
 };
 
 #include "impl/strategy.ipp"

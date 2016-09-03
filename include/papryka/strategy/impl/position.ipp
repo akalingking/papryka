@@ -16,19 +16,19 @@
 class Strategy::Position::Tracker
 {
 public:
-    Tracker();
+    inline Tracker();
     real_t get_shares() const { return shares_; }
-    real_t get_cash() const;
+    inline real_t get_cash() const;
     real_t get_cost_basis() const { return cost_basis_; }
     real_t get_commissions() const { return commissions_; }
-    real_t get_net_profit(real_t price, bool includeCommission=true) const;
-    real_t get_return(real_t price, bool includeCommission=true) const;
-    void buy(size_t quantity, real_t price, real_t commission);
-    void sell(size_t quantity, real_t price, real_t commission);
-    void reset();
+    inline real_t get_net_profit(real_t price, bool includeCommission=true) const;
+    inline real_t get_return(real_t price, bool includeCommission=true) const;
+    inline void buy(size_t quantity, real_t price, real_t commission);
+    inline void sell(size_t quantity, real_t price, real_t commission);
+    inline void reset();
         
 private:
-    void update_(size_t quantity, real_t price, real_t commission);
+    inline void update_(size_t quantity, real_t price, real_t commission);
     real_t shares_;
     real_t cash_;
     real_t commissions_;
@@ -148,13 +148,14 @@ struct Strategy::Position::StateMachine
 {
     Position& position;
     State state;
-    StateMachine(Position& position);
-    void switch_state(State newState);
-    bool is_open() const;
-    bool can_submit_order(order_t& order);
-    void on_order_event(order_event_t& event);
-    void enter();
-    void exit(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled);
+    
+    inline StateMachine(Position& position);
+    inline void switch_state(State newState);
+    inline bool is_open() const;
+    inline bool can_submit_order(order_t& order);
+    inline void on_order_event(order_event_t& event);
+    inline void enter();
+    inline void exit(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled);
 };
 #include "statemachine.ipp"
     
