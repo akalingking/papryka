@@ -1,13 +1,11 @@
-Papryka v2.0 
-~~~~~~~~~~~~
 
-PAPRYKA v2.0 - Timeseries Backtester for Trading Systems
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+PAPRYKA v2.0 - Trading System - Strategy Backtester
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Status: Pre-Alpha
 
 FEATURES:
 * Trading system platform (Backtest Only)
-* Header only, uses template meta programming 
+* Uses c++ template,  header only library 
 * Components replaceable with custom objects (e.g. bar data type, memory allocator)
 * To use just copy header directory and start building strategies you want to validate, see test files for reference.
 
