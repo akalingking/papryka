@@ -67,7 +67,7 @@ void Exchange<_T, _Fill, _Commission>::on_bars_imp(const datetime_t& datetime, c
 template <typename _T, typename _Fill, typename _Commission>
 void Exchange<_T, _Fill, _Commission>::process_order(const datetime_t& datetime, const value_t& value, order_t* order)
 {
-    log_debug("Exchange::{} order id={} qty={0.3f} current date={}", __func__, order->id, order->quantity, to_str(datetime));
+    log_debug("Exchange::{} order id={} qty={} current date={}", __func__, order->id, order->quantity, to_str(datetime));
 
     if (!pre_process_order(datetime, value, order))
         return;
@@ -136,7 +136,7 @@ void Exchange<_T, _Fill, _Commission>::post_process_order(const datetime_t& date
 template <typename _T, typename _Fill, typename _Commission>
 bool Exchange<_T, _Fill, _Commission>::commit_order_execution(const datetime_t& datetime, order_t* order, fill_info_t* fill)
 {
-    log_trace("Exchange::{} %s id={} total qty={0.3f}, current={0.3f} fill={0.3f}", 
+    log_trace("Exchange::{} date={} id={} order qty={}, filled={}, to fill={}", 
             __func__, papryka::to_str(datetime), order->id, order->quantity, order->filled, fill->quantity);
 
     bool ret = false;

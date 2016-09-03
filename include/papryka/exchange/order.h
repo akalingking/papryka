@@ -52,7 +52,8 @@ public:
     real_t stop_price;
     real_t limit_price;
     
-    explicit Order(base_t::Type type, base_t::Action action, const std::string& symbol, size_t quantity, bool isFillOnClose=false, real_t limitPrice=real_t(0.0), real_t stopPrice=real_t(0.0));
+    Order(base_t::Type type, base_t::Action action, const std::string& symbol, size_t quantity, bool isFillOnClose=false, real_t limitPrice=real_t(0.0), real_t stopPrice=real_t(0.0));
+    ~Order();
     fill_info_ptr_t process(fill_t& fill, const value_t& value);
 };
 

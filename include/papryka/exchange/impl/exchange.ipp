@@ -2,16 +2,18 @@ template <typename _U> uint32_t  Exchange::order_id<_U>::value = 0;
 
 Exchange::Exchange(feed_ptr_t feed, real_t cash) : base_t(feed, cash) 
 {
-    log_debug("Exchange created");
+    log_debug("Exchange::{}", __func__);
 }
 
 bool Exchange::submit_order(order_ptr_t order) {
-//    log_trace("ExchangeBase::{} order id={} current date={}", __func__, 
-//            order->id, to_str(base_t::feed->current_date));
+//    log_trace("Exchange::{} order id={} current date={} (entry)", __func__,  order->id, to_str(base_t::feed->current_date));
 
+    log_trace("Exchange::{} (entry)", __func__);
     bool ret = false;
     if (order->is_initial()) 
     {
+        assert(feed);
+        log_trace("Exchange::{} current date={}", __func__, to_str(feed->current_date));
         order->set_submitted(++order_id_t::value, feed->current_date);
         base_t::register_order(order);
         // Switch from INITIAL -> SUBMITTED
@@ -21,8 +23,9 @@ bool Exchange::submit_order(order_ptr_t order) {
         //order_event.emit(...)
         ret = true;
     } else {
-        log_error("ExchangeBase::{} order id={} invalid state={}", __func__, order->id, order_t::to_str(order->state));
+        log_error("Exchange::{} order id={} invalid state={}", __func__, order->id, order_t::to_str(order->state));
     }
+    log_trace("Exchange::{} (exit)", __func__);
     return ret;
 }
 

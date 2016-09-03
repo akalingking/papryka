@@ -27,23 +27,23 @@
 
 namespace papryka {
 namespace detail {
-    
-    namespace {
-        template<typename _T> 
-        struct order_names_ { 
-            static const char* types[];
-            static const char* actions[];
-            static const char* states[];
-            static const char* errors[];
-            static const char* events[];
-        };
-        template<typename _T> const char* order_names_<_T>::types[] =   { "TypeNone", "Market", "Limit", "Stop", "StopLimit" };
-        template<typename _T> const char* order_names_<_T>::actions[] = { "StateNone", "Initial", "Submitted", "Accepted", "Canceled", "PartiallyFilled", "Filled" };
-        template<typename _T> const char* order_names_<_T>::states[] =  { "ActionNone", "Buy", "BuyToCover", "Sell", "SellShort" };
-        template<typename _T> const char* order_names_<_T>::errors[] =  {"ErrorNone", "OrderCanceled"};
-        template<typename _T> const char* order_names_<_T>::events[] =  { "TypeNone", "Accepted", "Canceled", "PartiallyFilled" };
-        typedef order_names_<void> order_names_t;
-    }
+    //@{ order table names
+    template<typename _T> 
+    struct order_names_ 
+    { 
+        static const char* types[];
+        static const char* actions[];
+        static const char* states[];
+        static const char* errors[];
+        static const char* events[];
+    };
+    template<typename _T> const char* order_names_<_T>::types[] =   { "TypeNone", "Market", "Limit", "Stop", "StopLimit" };
+    template<typename _T> const char* order_names_<_T>::actions[] = { "ActionNone", "Buy", "ButToCover", "Sell", "SellShort"};
+    template<typename _T> const char* order_names_<_T>::states[] =  { "StateNone", "Initial", "Submitted", "Accepted", "Canceled", "PartiallyFilled", "Filled" };
+    template<typename _T> const char* order_names_<_T>::errors[] =  { "ErrorNone", "OrderCanceled"};
+    template<typename _T> const char* order_names_<_T>::events[] =  { "TypeNone", "Accepted", "Canceled", "PartiallyFilled" };
+    typedef order_names_<void> order_names_t;
+    //@} order table names
     
     /**
      * @brief   Order state machine
@@ -51,8 +51,8 @@ namespace detail {
     class Order
     {
     public:
-        struct Event;
         struct Info;
+        struct Event;
         
         typedef Bar bar_t;
         typedef Event event_t;
@@ -83,11 +83,12 @@ namespace detail {
         real_t filled;
         real_t avg_fill_price;
         
+        inline ~Order();
         inline void set_submitted(uint32_t id, const datetime_t& datetime);
         inline void switch_state(State newState);
-        inline size_t get_remaining() const { return quantity - filled;  }
         inline void add_info(info_ptr_t& info);
         
+        size_t get_remaining() const { return quantity - filled;  }
         bool is_buy() const { return action == Buy || action == BuyToCover; }
         bool is_sell() const { return action == Sell || action == SellShort; }
         bool is_active() const { return state != State::Canceled && state != State::Filled; }
@@ -102,17 +103,55 @@ namespace detail {
         inline Order(Type type, Action action, const std::string& symbol, size_t quantity);
         
     private:
+        // state transition table
         inline size_t get_valid_states(State state, std::set<State>& next_states) const;
-        inline bool is_valid_state_(State current, State newState) const;
-        
+        inline bool is_valid_state_(State current, State newState) const;        
         static const constexpr int s_max_transition_state = 5;
-        struct StateTable {
+        struct StateTable 
+        {
             State current;
             State valid_states[s_max_transition_state];
         };
         template <typename _T> struct state_table { static StateTable value[]; };
         typedef state_table<void> state_table_t;
         state_table_t state_table_;
+        // order names instance
+        order_names_t order_names_;
+    };
+    
+    struct Order::Info
+    {
+        typedef std::shared_ptr<Info> ptr_t;
+        enum Error { ErrorNone=0, OrderCanceled = 1 };
+        static const char* to_str(Error error) { return order_names_t::errors[error]; }
+
+        real_t price;
+        size_t quantity;
+        real_t commission;
+        datetime_t datetime;
+        Error error;
+
+        Info(real_t price, size_t quantity, real_t commission, const datetime_t& datetime) : price(price), quantity(quantity), commission(commission), datetime(datetime), error(ErrorNone)
+        { log_trace("order::info::{}", __func__); }
+        ~Info() { log_trace("order::info::{}", __func__); }
+        Info() : error(ErrorNone), price(0), quantity(0), commission(0) { log_trace("order::info::{}", __func__); }
+        Info(Error error) : error(error), price(0), quantity(0), commission(0) { log_trace("order::info::{}", __func__); }
+    };
+    
+    struct Order::Event
+    {
+        typedef std::shared_ptr<Event> ptr_t;
+        enum Type { None = 0, Accepted = 1, Canceled = 2, PartiallyFilled = 3, Filled = 4 };
+        static const char* to_str(Type type) { return order_names_t::events[type]; }
+
+        datetime_t datetime;
+        Order* order;
+        Type type;
+        Info::ptr_t info;
+
+        Event(const datetime_t& datetime, Order* order, Type type, Info::ptr_t info) : datetime(datetime), order(order), type(type), info(info)
+        { log_trace("Order::Event::{} type={}", __func__, to_str(type)); }
+        ~Event() { log_trace("Order::Event::{} type={}", __func__, to_str(type)); }
     };
     
     // traits
