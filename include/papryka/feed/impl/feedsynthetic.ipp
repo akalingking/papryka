@@ -167,7 +167,13 @@ template<typename _T, typename _Generator>
 FeedSynthetic<_T, _Generator>::FeedSynthetic(datetime_t start, const datetime_t& end, Frequency frequency, size_t maxlen) :
         base_t(frequency, maxlen), start_(start), end_(end)
 {
-    log_trace("FeedSynthetic created");
+    log_debug("FeedSynthetic::{}", __func__);
+}
+
+template<typename _T, typename _Generator>
+FeedSynthetic<_T, _Generator>::~FeedSynthetic()
+{
+    log_debug("FeedSynthetic::{}", __func__);
 }
 
 template<typename _T, typename _Generator>

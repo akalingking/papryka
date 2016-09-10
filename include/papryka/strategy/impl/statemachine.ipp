@@ -1,8 +1,11 @@
-Strategy::Position::StateMachine::StateMachine(Position& position) : 
+
+template <typename _D, typename _T>
+Strategy<_D,_T>::Position::StateMachine::StateMachine(Position& position) : 
         position(position), state(StateIdle)
 {}
 
-void Strategy::Position::StateMachine::switch_state(State newState) 
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::StateMachine::switch_state(State newState) 
 {
     if (state != newState) 
     {
@@ -11,7 +14,8 @@ void Strategy::Position::StateMachine::switch_state(State newState)
     }
 }
 
-void Strategy::Position::StateMachine::enter()
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::StateMachine::enter()
 {
     switch (state) 
     {
@@ -28,12 +32,14 @@ void Strategy::Position::StateMachine::enter()
     }
 }
 
-bool Strategy::Position::StateMachine::is_open() const
+template <typename _D, typename _T>
+bool Strategy<_D,_T>::Position::StateMachine::is_open() const
 {
     return (state == StateOpen);
 }
 
-bool Strategy::Position::StateMachine::can_submit_order(order_t& order)
+template <typename _D, typename _T>
+bool Strategy<_D,_T>::Position::StateMachine::can_submit_order(order_t& order)
 {
     bool ret = false;
     switch (state) 
@@ -49,7 +55,8 @@ bool Strategy::Position::StateMachine::can_submit_order(order_t& order)
     return ret;
 }
 
-void Strategy::Position::StateMachine::on_order_event(order_event_t& event)
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::StateMachine::on_order_event(order_event_t& event)
 {
     Strategy& strategy = position.strategy;
     order_t* order = (order_t*)event.order;
@@ -120,7 +127,8 @@ void Strategy::Position::StateMachine::on_order_event(order_event_t& event)
     }
 }
 
-void Strategy::Position::StateMachine::exit(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled)
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::StateMachine::exit(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled)
 {
     Strategy& strategy = position.strategy;
     order_ptr_t& entry_order = position.entry_order;

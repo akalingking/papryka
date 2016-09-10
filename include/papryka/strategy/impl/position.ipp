@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class Strategy::Position::Tracker
+template <typename _D, typename _T>
+class Strategy<_D,_T>::Position::Tracker
 {
 public:
     inline Tracker();
@@ -36,10 +37,12 @@ private:
     real_t cost_per_share_; // volume weighted ave price per share.
 };
 
-Strategy::Position::Tracker::Tracker()
+template <typename _D, typename _T>
+Strategy<_D,_T>::Position::Tracker::Tracker()
 { reset(); }
 
-void Strategy::Position::Tracker::reset()
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::Tracker::reset()
 {
     shares_ = real_t(0);
     cash_ = real_t(0.0);
@@ -48,7 +51,8 @@ void Strategy::Position::Tracker::reset()
     cost_per_share_ = real_t(0.0);
 }
 
-void Strategy::Position::Tracker::update_(size_t quantity, real_t price, real_t commission)
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::Tracker::update_(size_t quantity, real_t price, real_t commission)
 {
     assert (quantity != 0);
     size_t total_shares = 0;
@@ -105,12 +109,14 @@ void Strategy::Position::Tracker::update_(size_t quantity, real_t price, real_t 
     shares_ = total_shares;
 }
 
-real_t Strategy::Position::Tracker::get_cash() const
+template <typename _D, typename _T>
+real_t Strategy<_D,_T>::Position::Tracker::get_cash() const
 {
     return cash_ - commissions_;
 }
 
-real_t Strategy::Position::Tracker::get_net_profit(real_t price, bool includeCommission) const
+template <typename _D, typename _T>
+real_t Strategy<_D,_T>::Position::Tracker::get_net_profit(real_t price, bool includeCommission) const
 {
     real_t ret = cash_;
     if (price == 0)
@@ -121,7 +127,8 @@ real_t Strategy::Position::Tracker::get_net_profit(real_t price, bool includeCom
     return ret;
 }
 
-real_t Strategy::Position::Tracker::get_return(real_t price, bool includeCommission) const
+template <typename _D, typename _T>
+real_t Strategy<_D,_T>::Position::Tracker::get_return(real_t price, bool includeCommission) const
 {
     real_t ret = 0.0;
     real_t net_profit = get_net_profit(price, includeCommission);
@@ -130,21 +137,23 @@ real_t Strategy::Position::Tracker::get_return(real_t price, bool includeCommiss
     return ret;
 }
 
-void Strategy::Position::Tracker::buy(size_t quantity, real_t price, real_t commission)
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::Tracker::buy(size_t quantity, real_t price, real_t commission)
 {
     assert (quantity > 0);
     this->update_(quantity, price, commission);   
 }
 
-void Strategy::Position::Tracker::sell(size_t quantity, real_t price, real_t commission)
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::Tracker::sell(size_t quantity, real_t price, real_t commission)
 {
     assert (quantity > 0);
     update_(quantity*-1.0, price, commission);
 }
 
 
-
-struct Strategy::Position::StateMachine
+template <typename _D, typename _T>
+struct Strategy<_D,_T>::Position::StateMachine
 {
     Position& position;
     State state;
@@ -159,23 +168,26 @@ struct Strategy::Position::StateMachine
 };
 #include "statemachine.ipp"
     
-template<typename _T> uint32_t Strategy::Position::statics_<_T>::id = 0;
-template<typename _T> const char*  Strategy::Position::statics_<_T>::directions[] = {"LongOnly","ShortOnly","LongShort"};
-template<typename _T> const char* Strategy::Position::statics_<_T>::states[] = {"StateIdle","StateOpen","StateClose"};
+template <typename _D, typename _T> template<typename _U> uint32_t Strategy<_D,_T>::Position::statics_<_U>::id = 0;
+template <typename _D, typename _T> template<typename _U> const char*  Strategy<_D,_T>::Position::statics_<_U>::directions[] = {"LongOnly","ShortOnly","LongShort"};
+template <typename _D, typename _T> template<typename _U> const char* Strategy<_D,_T>::Position::statics_<_U>::states[] = {"StateIdle","StateOpen","StateClose"};
 
-Strategy::Position::Position(Strategy& strategy, bool isGoodTillCanceled, bool isAllOrNone, Direction direction, Market::Type marketType) :
+template <typename _D, typename _T>
+Strategy<_D,_T>::Position::Position(Strategy& strategy, bool isGoodTillCanceled, bool isAllOrNone, Direction direction, Market::Type marketType) :
     strategy(strategy), market_type(marketType), direction(direction), is_good_till_canceled(isGoodTillCanceled), is_all_or_none(isAllOrNone),
     shares_(0), id(++statics_t::id), statemachine_(new StateMachine(*this)), tracker_(new Tracker())
 {
     log_trace("Position::{} id={}",  __func__, id);
 }
 
-Strategy::Position::~Position()
+template <typename _D, typename _T>
+Strategy<_D,_T>::Position::~Position()
 {
     log_debug("Position::{} id={}", __func__, id);
 }
 
-void Strategy::Position::submit_and_register_order(order_ptr_t order)
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::submit_and_register_order(order_ptr_t order)
 {
     if (!statemachine_->can_submit_order(*order.get())) {
         assert(false);
@@ -187,7 +199,8 @@ void Strategy::Position::submit_and_register_order(order_ptr_t order)
     active_orders_[order->id] = order;
 }
 
-void Strategy::Position::submit_exit_order(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled)
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::submit_exit_order(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled)
 {
     assert (is_entry_active());
     assert (!is_exit_active());
@@ -200,7 +213,8 @@ void Strategy::Position::submit_exit_order(real_t stopPrice, real_t limitPrice, 
     submit_and_register_order(exit_order);
 }
 
-void Strategy::Position::on_order_event(order_event_ptr_t orderEvent)
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::on_order_event(order_event_ptr_t orderEvent)
 {   
     log_trace("Position:{} {} id={} event={}", __func__,
         papryka::to_str(orderEvent->datetime), id, order_t::Event::to_str(orderEvent->type));
@@ -239,7 +253,8 @@ void Strategy::Position::on_order_event(order_event_ptr_t orderEvent)
     statemachine_->on_order_event(*orderEvent.get());
 }
 
-void Strategy::Position::update_pos_tracker(order_event_t& orderEvent)
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::update_pos_tracker(order_event_t& orderEvent)
 {   
     if (orderEvent.type == order_t::Event::PartiallyFilled || orderEvent.type  == order_t::Event::Filled)
     {
@@ -255,69 +270,82 @@ void Strategy::Position::update_pos_tracker(order_event_t& orderEvent)
     }
 }
 
-bool Strategy::Position::is_entry_active() const 
+template <typename _D, typename _T>
+bool Strategy<_D,_T>::Position::is_entry_active() const 
 { 
     return (entry_order && entry_order->is_active());
 }
 
-bool Strategy::Position::is_entry_filled() const 
+template <typename _D, typename _T>
+bool Strategy<_D,_T>::Position::is_entry_filled() const 
 {   
     return (entry_order && entry_order->is_filled());
 }
 
-bool Strategy::Position::is_exit_active() const 
+template <typename _D, typename _T>
+bool Strategy<_D,_T>::Position::is_exit_active() const 
 {
     return (exit_order && exit_order->is_active());
 }
 
-bool Strategy::Position::is_exit_filled() const 
+template <typename _D, typename _T>
+bool Strategy<_D,_T>::Position::is_exit_filled() const 
 { 
     return (exit_order && exit_order->is_filled()); 
 }
 
-bool Strategy::Position::is_open() const
+template <typename _D, typename _T>
+bool Strategy<_D,_T>::Position::is_open() const
 {
     return statemachine_->is_open();
 }
 
-const std::string& Strategy::Position::get_symbol() const 
+template <typename _D, typename _T>
+const std::string& Strategy<_D,_T>::Position::get_symbol() const 
 { 
     return entry_order->symbol; 
 }
 
-void Strategy::Position::cancel_entry()
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::cancel_entry()
 {
     if (entry_order && entry_order->is_active())
         strategy.exchange->cancel_order(entry_order->id);
 }
 
-void Strategy::Position::cancel_exit()
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::cancel_exit()
 {
     if (exit_order && exit_order->is_active())
         strategy.exchange->cancel_order(exit_order->id);
 }
 
-void Strategy::Position::exit_market(bool goodTillCanceled) 
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::exit_market(bool goodTillCanceled) 
 { 
     statemachine_->exit(0, 0, goodTillCanceled);
 }
 
-void Strategy::Position::exit_limit(real_t limitPrice, bool goodTillCanceled)
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::exit_limit(real_t limitPrice, bool goodTillCanceled)
 {
     statemachine_->exit(0, limitPrice, goodTillCanceled);
 }
 
-void Strategy::Position::exit_stop(real_t stopPrice, bool goodTillCanceled)
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::exit_stop(real_t stopPrice, bool goodTillCanceled)
 {
     statemachine_->exit(stopPrice, 0, goodTillCanceled);
 }
 
-void Strategy::Position::exit_stop_limit(real_t stopPrice, real_t limitPrice, bool goodTillCanceled)
+template <typename _D, typename _T>
+void Strategy<_D,_T>::Position::exit_stop_limit(real_t stopPrice, real_t limitPrice, bool goodTillCanceled)
 {
     statemachine_->exit(stopPrice, limitPrice, goodTillCanceled);
 }
 
-real_t Strategy::Position::get_last_price() const
+template <typename _D, typename _T>
+real_t Strategy<_D,_T>::Position::get_last_price() const
 {
     real_t ret = 0;
     std::string symbol = get_symbol();
@@ -326,7 +354,8 @@ real_t Strategy::Position::get_last_price() const
     return ret;
 }
 
-real_t Strategy::Position::get_return(bool includeCommission) const
+template <typename _D, typename _T>
+real_t Strategy<_D,_T>::Position::get_return(bool includeCommission) const
 {
     log_trace("Position:{0:} last price {1:0.3f}", __func__, get_last_price());
     
@@ -340,7 +369,8 @@ real_t Strategy::Position::get_return(bool includeCommission) const
     return ret;
 }
 
-real_t Strategy::Position::get_pnl(bool includeCommission) const
+template <typename _D, typename _T>
+real_t Strategy<_D,_T>::Position::get_pnl(bool includeCommission) const
 {
     real_t ret = 0;
     real_t price = get_last_price();
@@ -349,7 +379,8 @@ real_t Strategy::Position::get_pnl(bool includeCommission) const
     return ret;
 }
 
-const Milliseconds Strategy::Position::get_age() const
+template <typename _D, typename _T>
+const Milliseconds Strategy<_D,_T>::Position::get_age() const
 {
     Milliseconds age = Milliseconds(0);
     if (entry_datetime != nulldate) 
@@ -359,75 +390,77 @@ const Milliseconds Strategy::Position::get_age() const
     }
     return age;
 }
-    
-    
-LongPosition::LongPosition(Strategy& strategy, const std::string& symbol, real_t stopPrice, real_t limitPrice, size_t quantity,
-        bool isGoodTillCanceled, bool isAllOrNone) : Position(strategy, isGoodTillCanceled, isAllOrNone, Position::LongOnly, Market::Stock)
+//    
+template <typename _D, typename _T>    
+LongPosition<_D,_T>::LongPosition(strategy_t& strategy, const std::string& symbol, real_t stopPrice, real_t limitPrice, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone) : 
+            base_t(strategy, isGoodTillCanceled, isAllOrNone, base_t::Position::LongOnly, Market::Stock)
 {
     assert (quantity > 0);
     if (limitPrice == 0 && stopPrice == 0)
     {
-        entry_order = strategy.create_order(order_t::Market, order_t::Action::Buy, symbol, quantity,  false);
+        base_t::entry_order = strategy.create_order(order_t::Market, order_t::Action::Buy, symbol, quantity,  false);
     }
     else if (limitPrice != 0 && stopPrice == 0)
     {
-        entry_order = strategy.create_order(order_t::Limit, order_t::Action::Buy, symbol, quantity, false, limitPrice);
+        base_t::entry_order = strategy.create_order(order_t::Limit, order_t::Action::Buy, symbol, quantity, false, limitPrice);
     }
     else if (limitPrice == 0 && stopPrice != 0)
     {
-        entry_order = strategy.create_order(order_t::Stop, order_t::Action::Buy, symbol, quantity, false, 0, stopPrice);
+        base_t::entry_order = strategy.create_order(order_t::Stop, order_t::Action::Buy, symbol, quantity, false, 0, stopPrice);
     }
     else if (limitPrice != 0 && stopPrice != 0)
     {
-        entry_order = strategy.create_order(order_t::StopLimit, order_t::Action::Buy, symbol, quantity, false, limitPrice, stopPrice);
+        base_t::entry_order = strategy.create_order(order_t::StopLimit, order_t::Action::Buy, symbol, quantity, false, limitPrice, stopPrice);
     }
     else
     {
         assert (false);
     }
     
-    entry_order->is_all_or_none = isAllOrNone;
-    entry_order->is_good_till_canceled = isGoodTillCanceled;
+    base_t::entry_order->is_all_or_none = isAllOrNone;
+    base_t::entry_order->is_good_till_canceled = isGoodTillCanceled;
     
-    tracker_.reset(new Tracker());
+    base_t::tracker_.reset(new typename base_t::Tracker());
     
-    submit_and_register_order(entry_order);
-    strategy.register_position(Position::ptr_t(this));
+    base_t::submit_and_register_order(base_t::entry_order);
+    strategy.register_position(base_t::Position::ptr_t(this));
     
-    statemachine_->switch_state(StateIdle);
+    base_t::statemachine_->switch_state(base_t::StateIdle);
     
-    log_trace("LongPosition::{} id={}", __func__, id);
+    log_trace("LongPosition::{} id={}", __func__, base_t::id);
 }
 
-LongPosition::~LongPosition()
+template <typename _D, typename _T>
+LongPosition<_D,_T>::~LongPosition()
 {
-    log_trace("LongPositin::{} id={}", __func__, id);
+    log_trace("LongPositin::{} id={}", __func__, base_t::id);
 }
 
-Strategy::Position::order_ptr_t LongPosition::build_exit_order(real_t stopPrice, real_t limitPrice)
+template <typename _D, typename _T>
+typename LongPosition<_D,_T>::order_ptr_t LongPosition<_D,_T>::build_exit_order(real_t stopPrice, real_t limitPrice)
 {
-    log_debug("LongPosition::{0:} id={1:} stop={2:0.3f} limit={3:0.3f}", __func__, id, stopPrice, limitPrice);
+    log_debug("LongPosition::{} id={} stop={} limit={}", __func__, base_t::id, stopPrice, limitPrice);
     
-    std::string symbol = get_symbol();
+    std::string symbol = base_t::get_symbol();
     
-    size_t quantity = shares_;
+    size_t quantity = base_t::shares_;
     
     order_ptr_t order;
     if (limitPrice == 0 && stopPrice == 0)
     {
-        order = strategy.exchange->create_order(order_t::Market, order_t::Sell, symbol, quantity,  false);
+        order = base_t::strategy.exchange->create_order(order_t::Market, order_t::Sell, symbol, quantity,  false);
     }
     else if (limitPrice != 0 && stopPrice == 0)
     {
-        order = strategy.exchange->create_order(order_t::Limit, order_t::Action::Sell, symbol, quantity, false, limitPrice);
+        order = base_t::strategy.exchange->create_order(order_t::Limit, order_t::Action::Sell, symbol, quantity, false, limitPrice);
     }
     else if (limitPrice == 0 && stopPrice != 0)
     {
-        order = strategy.exchange->create_order(order_t::Stop, order_t::Sell, symbol, quantity, false, real_t(0), stopPrice);
+        order = base_t::strategy.exchange->create_order(order_t::Stop, order_t::Sell, symbol, quantity, false, real_t(0), stopPrice);
     }
     else if (limitPrice != 0 && stopPrice != 0)
     {
-        order = strategy.exchange->create_order(order_t::StopLimit, order_t::Sell, symbol, quantity, false, limitPrice, stopPrice);
+        order = base_t::strategy.exchange->create_order(order_t::StopLimit, order_t::Sell, symbol, quantity, false, limitPrice, stopPrice);
     }
     else
         assert (false);
@@ -435,67 +468,70 @@ Strategy::Position::order_ptr_t LongPosition::build_exit_order(real_t stopPrice,
     return order;
 }
 
-ShortPosition::ShortPosition(Strategy& strategy, const std::string& symbol, real_t stopPrice, real_t limitPrice, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone) :
-    Position(strategy, isGoodTillCanceled, isAllOrNone, Strategy::Position::ShortOnly, Market::Stock)
+template <typename _D, typename _T>
+ShortPosition<_D,_T>::ShortPosition(strategy_t& strategy, const std::string& symbol, real_t stopPrice, real_t limitPrice, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone) :
+    base_t::Position(strategy, isGoodTillCanceled, isAllOrNone, Strategy<_D,_T>::Position::ShortOnly, Market::Stock)
 {
     if (limitPrice == 0 && stopPrice == 0)
     {
-        entry_order = strategy.exchange->create_order(order_t::Market, order_t::SellShort, symbol, quantity,  false);
+        this->entry_order = this->strategy.exchange->create_order(order_t::Market, order_t::SellShort, symbol, quantity,  false);
     }
     else if (limitPrice != 0 && stopPrice == 0)
     {
-        entry_order = strategy.exchange->create_order(order_t::Limit, order_t::SellShort, symbol, quantity, false, limitPrice);
+        this->entry_order = this->strategy.exchange->create_order(order_t::Limit, order_t::SellShort, symbol, quantity, false, limitPrice);
     }
     else if (limitPrice == 0 && stopPrice != 0)
     {
-        entry_order = strategy.exchange->create_order(order_t::Stop, order_t::SellShort, symbol, quantity, false,real_t(0), stopPrice);
+        this->entry_order = this->strategy.exchange->create_order(order_t::Stop, order_t::SellShort, symbol, quantity, false,real_t(0), stopPrice);
     }
     else if (limitPrice != 0 && stopPrice != 0)
     {
-        entry_order = strategy.exchange->create_order(order_t::StopLimit, order_t::SellShort, symbol, quantity, false, limitPrice, stopPrice);
+        this->entry_order = this->strategy.exchange->create_order(order_t::StopLimit, order_t::SellShort, symbol, quantity, false, limitPrice, stopPrice);
     }
     else
         assert (false);
     
-    entry_order->is_all_or_none = isAllOrNone;
-    entry_order->is_good_till_canceled = isGoodTillCanceled;
+    this->entry_order->is_all_or_none = isAllOrNone;
+    this->entry_order->is_good_till_canceled = isGoodTillCanceled;
     
-    submit_and_register_order(entry_order);
-    strategy.register_position(Position::ptr_t(this));
+    this->submit_and_register_order(this->entry_order);
+    this->strategy.register_position(base_t::Position::ptr_t(this));
     
-    statemachine_->switch_state(StateIdle);
+    this->statemachine_->switch_state(base_t::StateIdle);
     
-    log_trace("ShortPosition::{} id={}", __func__, id);
+    log_trace("ShortPosition::{} id={}", __func__, this->id);
 }
 
-ShortPosition::~ShortPosition()
+template <typename _D, typename _T>
+ShortPosition<_D,_T>::~ShortPosition()
 {
-    log_trace("ShortPosition::{} id={}", __func__, id);
+    log_trace("ShortPosition::{} id={}", __func__, this->id);
 }
 
-Strategy::Position::order_ptr_t ShortPosition::build_exit_order(real_t stopPrice, real_t limitPrice)
+template <typename _D, typename _T>
+typename ShortPosition<_D,_T>::order_ptr_t ShortPosition<_D,_T>::build_exit_order(real_t stopPrice, real_t limitPrice)
 {
-    log_trace("ShortPosition::{0:} id={1:} stop={2:0.3f} limit={3:0.3f}", __func__, id, stopPrice, limitPrice);
+    log_trace("ShortPosition<_D,_T>::{0:} id={} stop={} limit={}", __func__, this->id, stopPrice, limitPrice);
     
-    std::string symbol = get_symbol();
-    size_t quantity = shares_ * -1;
+    std::string symbol = this->get_symbol();
+    size_t quantity = this->shares_ * -1;
     
     order_ptr_t order;
     if (limitPrice == 0 && stopPrice == 0)
     {
-        order = strategy.exchange->create_order(order_t::Market, order_t::BuyToCover, symbol, quantity,  false);
+        order = this->strategy.exchange->create_order(order_t::Market, order_t::BuyToCover, symbol, quantity,  false);
     }
     else if (limitPrice != 0 && stopPrice == 0)
     {
-        order = strategy.exchange->create_order(order_t::Limit, order_t::BuyToCover, symbol, quantity, limitPrice);
+        order = this->strategy.exchange->create_order(order_t::Limit, order_t::BuyToCover, symbol, quantity, limitPrice);
     }
     else if (limitPrice == 0 && stopPrice != 0)
     {
-        order = strategy.exchange->create_order(order_t::Stop, order_t::BuyToCover, symbol, quantity, stopPrice);
+        order = this->strategy.exchange->create_order(order_t::Stop, order_t::BuyToCover, symbol, quantity, stopPrice);
     }
     else if (limitPrice != 0 && stopPrice != 0)
     {
-        order = strategy.exchange->create_order(order_t::StopLimit, order_t::BuyToCover, symbol, quantity, stopPrice, limitPrice);
+        order = this->strategy.exchange->create_order(order_t::StopLimit, order_t::BuyToCover, symbol, quantity, stopPrice, limitPrice);
     }
     else
         assert (false);

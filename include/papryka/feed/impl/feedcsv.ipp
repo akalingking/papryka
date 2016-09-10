@@ -50,7 +50,8 @@ void FeedCsv<_T>::add_values_from_csv(const std::string& symbol, const std::stri
             
             _T type_value = (_T)value; 
             
-            log_debug("FeedCsv<_T>::{} date={} value={}", __func__, to_str(date), value);
+            log_trace("FeedCsv<_T>::{} date={} value={}", __func__, to_str(date), value);
+            
             if (base_t::row_filter_)
             {
                 if (base_t::row_filter_->include_row(date, type_value))
@@ -137,7 +138,8 @@ void FeedCsv<Bar>::add_values_from_csv(const std::string& symbol, const std::str
             bar.volume = row_data[4];//volume
             bar.closeadj = row_data[5];//adjClose
             
-            log_debug("FeedCsv<Bar>::{0:} o:{1:.3f} h:{2:.3f} l:{3:.3f} c:{4:.3f} v:{5:.3f} a:{6:.3f}", __func__, bar.open, bar.high, bar.low, bar.close, bar.volume, bar.closeadj);
+            log_trace("FeedCsv<Bar>::{0:} {1:} o:{2:.3f} h:{3:.3f} l:{4:.3f} c:{5:.3f} a:{6:.3f} v:{7:.3f}", __func__, 
+                    to_str(date), bar.open, bar.high, bar.low, bar.close, bar.closeadj, bar.volume);
             
             if (row_filter_)
             {

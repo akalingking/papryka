@@ -18,15 +18,16 @@
  */
 template<typename _T>
 Feed<_T>::Feed(Frequency frequency, size_t maxLen) :
-        maxlen(maxLen), frequency(frequency), date_format(frequency==Frequency::Day?s_date_format:s_datetime_ms_format), is_closeadj_on(false)
+        maxlen(maxLen), frequency(frequency), date_format(frequency==Frequency::Day?s_date_format:s_datetime_ms_format), is_closeadj_on(false),
+        current_date(nulldate)
 {
-    log_trace("Feed<_T>::{}", __func__);
+    log_trace("Feed<{}>::{}", type_name<_T>(), __func__);
 }
 
 template<typename _T>
 Feed<_T>::~Feed() 
 { 
-    log_trace("Feed<_T>::{}", __func__);
+    log_trace("Feed<{}>::{}", type_name<_T>(), __func__);
 }
 
 template<typename _T>
@@ -46,7 +47,7 @@ template<typename _T>
 bool Feed<_T>::dispatch() 
 {
     
-    log_trace("Feed<_T::{} (entry)", __func__);
+    log_trace("Feed<_T>::{} (entry)", __func__);
     
     datetime_t datetime;
     values_t values;
@@ -54,14 +55,12 @@ bool Feed<_T>::dispatch()
     if (datetime != nulldate) 
     {
         current_date = datetime;
-#ifdef _DEBUG
         for (const typename values_t::value_type& item : values) {
             std::stringstream strm;
             strm << item.second;
             std::string str = strm.str();
-            log_debug("Feed<_T>::{} {} {} {}", __func__, papryka::to_str(datetime), item.first, str);
+            log_trace("Feed<_T>::{} {} {} {}", __func__, papryka::to_str(datetime), item.first, str);
         }
-#endif
         new_values_event.emit(datetime, values);
     }
     

@@ -60,7 +60,7 @@ namespace papryka {
     }
 
     inline std::ostream& operator<<(std::ostream& os, const Bar& bar) {
-        os << std::fixed << std::setprecision(papryka::precision::s_precision) << "o: " << bar.open << " h:" << bar.high << " l:" << bar.low << " c:" << bar.close  << " v:"  << bar.volume;
+        os << std::fixed << std::setprecision(papryka::precision::s_precision) << "o:" << bar.open << " h:" << bar.high << " l:" << bar.low << " c:" << bar.close  << " adj:" << bar.closeadj << " v:"  << bar.volume;
         return os;
     }
 }

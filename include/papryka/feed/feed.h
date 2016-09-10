@@ -22,6 +22,7 @@
 #include "../detail/subject.h"
 #include "../detail/logger.h"
 #include "../detail/traits.h"
+#include "../detail/typename.h"
 #include "detail/filter.h"
 #include "timeseries.h"
 #include <memory>

@@ -20,13 +20,13 @@ template<typename _T>
 FeedMem<_T>::FeedMem(Frequency frequency, size_t maxlen) :
         Feed<_T>(frequency, maxlen), is_started_(false)
 {
-    
+    log_trace("FeedMem<{}>::{} entry", type_name<_T>(),__func__);
 }
 
 template<typename _T>
 bool FeedMem<_T>::add_values(const std::string& name, const rows_t& rows)
 {
-    log_trace("FeedMem::{} entry", __func__);
+    log_trace("FeedMem<{}>::{} entry", type_name<_T>(),__func__);
     
     if (is_started_)
     {
@@ -57,23 +57,26 @@ bool FeedMem<_T>::add_values(const std::string& name, const rows_t& rows)
 
 template<typename _T>
 void FeedMem<_T>::start() {
+    log_trace("FeedMem<{}>::{}", type_name<_T>(), __func__);
     is_started_ = true;
 }
 
 template<typename _T>
 void FeedMem<_T>::stop() {
+    log_trace("FeedMem<_T>::{}", __func__);
     is_started_ = false;
 }
 
 template<typename _T>
 void FeedMem<_T>::reset() {
+    log_trace("FeedMem<_T>::{}", __func__);
     is_started_ = false; 
     Feed<_T>::reset();
 }
 
 template<typename _T>
 bool FeedMem<_T>::eof() {
-//    log_trace("FeedMem::eof entry");
+    log_trace("FeedMem::eof entry");
     bool ret = true;
     typename map_rows_t::iterator iter;
     for (iter = map_rows_.begin(); iter != map_rows_.end(); ++iter)
@@ -88,12 +91,15 @@ bool FeedMem<_T>::eof() {
             break;
         }
     }
-//    log_trace("FeedMem::eof exit");
+    log_trace("FeedMem::eof exit");
     return ret;
 }
 
 template<typename _T>
-datetime_t FeedMem<_T>::peek_date() {
+datetime_t FeedMem<_T>::peek_date() 
+{
+    log_trace("FeedMem<_T>::{} (entry)", __func__);
+    
     datetime_t date;
     size_t next_index = 0;
     typename map_rows_t::iterator iter;
@@ -112,6 +118,7 @@ datetime_t FeedMem<_T>::peek_date() {
         }
     }
     
+    log_trace("FeedMem<_T>::{} (exit)", __func__);
     return date;
 }
 
@@ -150,6 +157,8 @@ bool FeedMem<_T>::get_next(datetime_t& date, values_t& values)
         }
         ret = true;
     }
+    
     log_trace("FeedMem::get_next exit");
+    
     return ret;
 }
