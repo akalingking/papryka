@@ -9,6 +9,8 @@
  */
 real_t FillTrigger::get_stop_price_trigger(Order::Action action, real_t stopPrice, bool useAdjValues, const value_t& bar)
 {
+    log_debug("FillTrigger::{} action={} stop price={} {}", __func__, Order::to_str(action), stopPrice, bar);
+    
     real_t ret = real_t(0.0);
     real_t open = bar.open;
     real_t high = bar.high;
@@ -27,6 +29,8 @@ real_t FillTrigger::get_stop_price_trigger(Order::Action action, real_t stopPric
             else
                 ret = stopPrice;
         }
+        
+        log_debug("FillTrigger::{} stop price={} {} triggered for {}, price={}", __func__, stopPrice, ((ret!=0.0)?"is":"not"), Order::to_str(action), ret);
     }
         // If the bar is below the stop price, use the open price.
         // If the bar includes the stop price, use the open price 
@@ -42,6 +46,8 @@ real_t FillTrigger::get_stop_price_trigger(Order::Action action, real_t stopPric
             else
                 ret = stopPrice;
         }
+        
+        log_debug("FillTrigger::{} stop price={} {} triggered for {}, price={}", __func__, stopPrice, ((ret!=0.0)?"is":"not"), Order::to_str(action), ret);
     }
     else
         assert(false);
@@ -54,6 +60,8 @@ real_t FillTrigger::get_stop_price_trigger(Order::Action action, real_t stopPric
 
 real_t FillTrigger::get_limit_price_trigger(Order::Action action, real_t limitPrice, bool useAdjValues, const value_t& bar)
 {
+    log_debug("FillTrigger::{} action={} limit price={} {}", __func__, Order::to_str(action), limitPrice, bar);
+    
     real_t ret = real_t(0.0);
     real_t open = bar.open;
     real_t high = bar.high;
@@ -74,6 +82,8 @@ real_t FillTrigger::get_limit_price_trigger(Order::Action action, real_t limitPr
             else
                 ret = limitPrice;
         }
+        
+        log_debug("FillTrigger::{} limitprice={} {} triggered for {}, price={}", __func__, limitPrice, ((ret != 0.0)?"is":"not"), Order::to_str(action), ret);
     }
         // If the bar is above the limit price, use the open price.
         // If the bar includes the limit price, use the open price or the limit price.
@@ -90,6 +100,8 @@ real_t FillTrigger::get_limit_price_trigger(Order::Action action, real_t limitPr
             else
                 ret = limitPrice;
         }
+        
+        log_debug("FillTrigger::{} limitprice={} {} triggered for {}, price={}", __func__, limitPrice, ((ret != 0.0)?"is":"not"), Order::to_str(action), ret);
     }
     else
         assert(false);
@@ -146,7 +158,7 @@ void FillType<Bar>::on_order_filled(_Order& order)
     if (volume_limit_ != real_t(0.0))
     {
         if (order_size > volume_left)
-            log_error("FillType::{0:} {1:} order qty={2:} volume left={3:0.3f}", __func__, symbol, order_size, volume_left);
+            log_error("FillType::{} {} order qty={} volume left={}", __func__, symbol, order_size, volume_left);
         else
             volume_left_[symbol] = precision::round(volume_left - order_size);
     }
@@ -155,14 +167,14 @@ void FillType<Bar>::on_order_filled(_Order& order)
 }
 
 template <typename _Order>
-FillType<Bar>::info_ptr_t FillType<Bar>::fill(_Order& order, const value_t& value, market_order_tag&)
+FillType<Bar>::info_ptr_t FillType<Bar>::fill(_Order& order, const value_t& value, market_order_tag&&)
 {
     info_ptr_t ret = nullptr;
     real_t fill_size = calculate_fill_size_(order, value);
 
     if (fill_size == 0)
     {
-        log_error("FillType::{0:} not enough volume to fill {1:} market order [id={2:}] for {3:0.3f} share/s.", __func__, order.symbol, order.id, order.get_remaining());
+        log_error("FillType::{} not enough volume to fill {} market order [id={}] for {} share/s.", __func__, order.symbol, order.id, order.get_remaining());
     }
     else
     {
@@ -186,20 +198,21 @@ FillType<Bar>::info_ptr_t FillType<Bar>::fill(_Order& order, const value_t& valu
 }
 
 template <typename _Order>
-FillType<Bar>::info_ptr_t FillType<Bar>::fill(_Order& order, const value_t& bar, limit_order_tag&)
+FillType<Bar>::info_ptr_t FillType<Bar>::fill(_Order& order, const value_t& bar, limit_order_tag&&)
 {
     info_ptr_t ret = nullptr;
-    real_t fill_size = real_t(0); //calculate_fill_size_(order, bar);
+    real_t fill_size = calculate_fill_size_(order, bar);
 
     if (fill_size == real_t(0))
     {
-        log_error("FillType::{} not enough volume to fill {} stop order id={} for {0.3f} share/s", __func__,
-            order.symbol, order.id, order.get_remaining());
+        log_warn("FillType::{} not enough volume to fill {} limit order id={} for {} share/s", __func__, order.symbol, order.id, order.get_remaining());
     }
     else
     {
         real_t price = FillTrigger().get_limit_price_trigger(order.action, order.limit_price, false, bar);
+        
         order.is_limit_hit = price != real_t(0.0);
+        
         if (price != real_t(0.0))
             ret.reset(new FillInfo(price, fill_size));
     }
@@ -208,7 +221,7 @@ FillType<Bar>::info_ptr_t FillType<Bar>::fill(_Order& order, const value_t& bar,
 }
 
 template <typename _Order>
-FillType<Bar>::info_ptr_t FillType<Bar>::fill_stop_order(_Order& order, const value_t& bar, stop_order_tag&)
+FillType<Bar>::info_ptr_t FillType<Bar>::fill(_Order& order, const value_t& bar, stop_order_tag&&)
 {
     info_ptr_t ret = nullptr;
     real_t stop_price_trigger = real_t(0);
@@ -223,8 +236,7 @@ FillType<Bar>::info_ptr_t FillType<Bar>::fill_stop_order(_Order& order, const va
         int fill_size = calculate_fill_size_(order, bar);
         if (fill_size == 0)
         {
-            log_debug("FillType::{} not enough volume to fill "
-                "{} stop order id={} for {} share/s", __func__, order.symbol, order.id, order.get_remaining());
+            log_debug("FillType::{} not enough volume to fill {} stop order id={} for {} share/s", __func__, order.symbol, order.id, order.get_remaining());
         }
         else
         {
@@ -240,7 +252,7 @@ FillType<Bar>::info_ptr_t FillType<Bar>::fill_stop_order(_Order& order, const va
 }
 
 template <typename _Order>
-FillType<Bar>::info_ptr_t FillType<Bar>::fill(_Order& order, const value_t& bar, stop_limit_order_tag&)
+FillType<Bar>::info_ptr_t FillType<Bar>::fill(_Order& order, const value_t& bar, stop_limit_order_tag&&)
 {
     info_ptr_t ret = nullptr;
     real_t stop_price_trigger = real_t(0);
@@ -256,9 +268,7 @@ FillType<Bar>::info_ptr_t FillType<Bar>::fill(_Order& order, const value_t& bar,
 
         if (fill_size == 0)
         {
-            log_error("FillType::{} not enough volume to fill "
-                "{} stop limit order id={} for {} share/s", __func__,
-                order.symbol, order.id, order.get_remaining());
+            log_error("FillType::{} not enough volume to fill {} stop limit order id={} for {} share/s", __func__, order.symbol, order.id, order.get_remaining());
         }
         else
         {

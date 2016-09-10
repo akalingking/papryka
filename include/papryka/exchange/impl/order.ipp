@@ -1,7 +1,7 @@
 
 template <typename _Fill>
-Order<_Fill>::Order(base_t::Type type, base_t::Action action, const std::string& symbol, size_t quantity, bool isFillOnClose, real_t limitPrice, real_t stopPrice) :
-        base_t(type, action, symbol, quantity), is_fill_on_close(isFillOnClose), limit_price(limitPrice), stop_price(stopPrice)
+Order<_Fill>::Order(base_t::Type type, base_t::Action action, const std::string& symbol, size_t quantity, bool isFillOnClose, real_t stopPrice, real_t limitPrice) :
+        base_t(type, action, symbol, quantity), is_fill_on_close(isFillOnClose), stop_price(stopPrice), limit_price(limitPrice)
 {
     log_trace("Order<_Fill>::{}", __func__);
 }
@@ -18,10 +18,16 @@ typename Order<_Fill>::fill_info_ptr_t Order<_Fill>::process(fill_t& fill, const
     switch (base_t::type)
     {
         case base_t::Market:
-            typename detail::order_traits<base_t::Market>::type tag;
-            return fill.fill(*this, value, tag);
-            //...
+            return fill.fill(*this, value, detail::order_traits<base_t::Market>::type());
+        case base_t::Limit:
+            return fill.fill(*this, value, detail::order_traits<base_t::Limit>::type());
+        case base_t::Stop:
+            return fill.fill(*this, value, detail::order_traits<base_t::Stop>::type());
+        case base_t::StopLimit:
+            return fill.fill(*this, value, detail::order_traits<base_t::StopLimit>::type());
         default:
+            log_error("Order<_Fill>::{} fill type not implemented", __func__);
+            assert (false);
             return 0;
     }
 }

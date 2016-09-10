@@ -19,32 +19,52 @@
 #pragma once
 #include "subject.h"
 #include "event.h"
+#include "logger.h"
 #include <vector>
 #include <memory>
+#include <thread>
+#include <condition_variable>
+#include <exception>
+#include <atomic>
 
 namespace papryka {
-    
+
+/**
+ * @brief   Event dispatcher
+ * @todo    Create separately for backtest and live trading
+ */
 class Dispatcher
 {
 public:
-    typedef std::shared_ptr<Subject> ptr_t;
-    typedef std::vector<ptr_t> subjects_t;
+    typedef std::thread thread_t;
+    typedef std::mutex mutex_t;
+    typedef std::condition_variable cond_t;
+    typedef std::shared_ptr<Subject> subject_ptr_t;
+    typedef std::vector<subject_ptr_t> subjects_t;
+    
     Event start_event;
     Event idle_event;
     Event stop_event;
     datetime_t current_date;
 
     inline Dispatcher();
-    inline void run();
-    inline void add_subject(const ptr_t& ptr);
-    void stop() { is_stop_ = true; }
-    bool is_stop() const { return is_stop_; }
+    inline ~Dispatcher();
+    inline bool add_subject(const subject_ptr_t& ptr);
+    inline bool stop();
+    inline bool start();
+    inline void wait();
 
 private:
-    inline bool dispatch_subject_(ptr_t& ptr, const datetime_t& currentDate);
+    inline bool is_run() const;
+    inline void do_work();
+    inline bool dispatch_subject_(subject_ptr_t& ptr, const datetime_t& currentDate);
     inline bool dispatch_(bool& eof);        
     subjects_t subjects_;
-    bool is_stop_;
+    // slower but safer
+    std::atomic<bool> is_run_;
+    std::unique_ptr<thread_t> thread_;
+    mutex_t mutex_stop_;
+    cond_t cond_stop_;
 };
     
 #include "impl/dispatcher.ipp"

@@ -31,6 +31,7 @@ void Exchange<_T, _Fill, _Commission>::on_bars(const datetime_t& datetime, const
 template <typename _T, typename _Fill, typename _Commission>
 void Exchange<_T, _Fill, _Commission>::on_bars_imp(const datetime_t& datetime, const values_t& values, order_t* order)
 {
+    log_debug("Exchange:{} {} order id={}", __func__, to_str(datetime), order->id);
     const std::string& symbol = order->symbol;
     typename values_t::const_iterator iter = values.find(symbol);
     if (iter == values.end())
@@ -95,15 +96,21 @@ bool Exchange<_T, _Fill, _Commission>::pre_process_order(const datetime_t& datet
     if (!order->is_good_till_canceled)
     {
         // NOTE: Order expires if time delta is more than a day.
+        date_t bar_date = to_date(datetime);
+        date_t accepted_date = to_date(order->accepted_date);
+        log_debug("Exchange::{} bar date={}", __func__, to_str(bar_date));
+        log_debug("Exchange::{} accepted date {}", __func__, to_str(accepted_date));
         bool expired = to_date(datetime) > to_date(order->accepted_date);
         if (expired)
         {
-            log_debug("Exchange::{} order id={} has expired, bar date={} accepted date={}",
-                    __func__, order->id, to_str(datetime), to_str(order->accepted_date));
-            unregister_order(order->id);
+            log_warn("Exchange::{} order id={} has expired, bar date={} accepted date={}", __func__, order->id, to_str(datetime), to_str(order->accepted_date));
+            
             order->switch_state(order_t::Canceled);
             event_ptr_t event(new typename order_t::Event(datetime, order, order_t::Event::Canceled, info_ptr_t(nullptr)));
-            order_event.emit(*this, order_event);
+            order_event.emit(*this, event);
+            
+            unregister_order(order->id);
+            
             ret = false;
         }
     }
@@ -114,21 +121,23 @@ bool Exchange<_T, _Fill, _Commission>::pre_process_order(const datetime_t& datet
 template <typename _T, typename _Fill, typename _Commission>
 void Exchange<_T, _Fill, _Commission>::post_process_order(const datetime_t& datetime, const value_t& value, order_t* order)
 {
-    log_debug("Exchange::{} order id={} current date={} accepted date={}",
-        __func__, order->id, to_str(datetime), to_str(order->accepted_date));
+    log_debug("Exchange::{} order id={} current date={} accepted date={}", 
+            __func__, order->id, to_str(datetime), to_str(order->accepted_date));
 
     if (!order->is_good_till_canceled)
     {
         //only accept orders within the day.
-        bool expired = to_date(datetime) >= to_date(order->accepted_date);
+        bool expired = to_date(datetime) > to_date(order->accepted_date);
         if (expired)
         {
-            log_debug("Exchange::{} order id={} has expired", __func__, order->id);
-
-            unregister_order(order->id);
+            log_error("Exchange::{} order id={} has expired", __func__, order->id);
+            
+            // emit event first before destroying order instance in unregister_order
             order->switch_state(order_t::Canceled);
             event_ptr_t event(new typename order_t::Event(datetime, order, order_t::Event::Canceled, info_ptr_t(nullptr)));
             order_event.emit(*this, event);
+            
+            unregister_order(order->id);
         }
     }
 }
@@ -136,8 +145,7 @@ void Exchange<_T, _Fill, _Commission>::post_process_order(const datetime_t& date
 template <typename _T, typename _Fill, typename _Commission>
 bool Exchange<_T, _Fill, _Commission>::commit_order_execution(const datetime_t& datetime, order_t* order, fill_info_t* fill)
 {
-    log_trace("Exchange::{} date={} id={} order qty={}, filled={}, to fill={}", 
-            __func__, papryka::to_str(datetime), order->id, order->quantity, order->filled, fill->quantity);
+    log_debug("Exchange::{} date={} id={} order qty={}, filled={}, new fill={}", __func__, papryka::to_str(datetime), order->id, order->quantity, order->filled, fill->quantity);
 
     bool ret = false;
     real_t price = fill->price;
@@ -183,14 +191,14 @@ bool Exchange<_T, _Fill, _Commission>::commit_order_execution(const datetime_t& 
         if (order->is_filled())
         {
             event.reset(new typename order_t::Event(datetime, order, order_t::Event::Filled, info));
+            order_event.emit(*this, event);
             orders_.erase(order->id);
         }
         else if (order->is_partially_filled())
         {
             event.reset(new typename order_t::Event(datetime, order, order_t::Event::PartiallyFilled, info));
+            order_event.emit(*this, event);
         }
-
-        order_event.emit(*this, event);
 
         ret = true;
     }

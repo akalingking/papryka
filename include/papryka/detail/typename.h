@@ -22,12 +22,12 @@
 #include <cxxabi.h>
 
 namespace papryka {
-
-#ifdef _DEBUG
 /**
- * @brief extracts type name at runtime, **DO NOT USE** in production memory useage will slow us down.
+ * @brief extracts type name at runtime, 
+ * make sure we *DO NOT USE** in production|release mode, memory usage will slow us down.
  * @return 
  */
+#ifdef _DEBUG
 template<typename T>
 std::string type_name()
 {

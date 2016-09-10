@@ -41,7 +41,7 @@ namespace detail {
     template<typename _T> const char* order_names_<_T>::actions[] = { "ActionNone", "Buy", "ButToCover", "Sell", "SellShort"};
     template<typename _T> const char* order_names_<_T>::states[] =  { "StateNone", "Initial", "Submitted", "Accepted", "Canceled", "PartiallyFilled", "Filled" };
     template<typename _T> const char* order_names_<_T>::errors[] =  { "ErrorNone", "OrderCanceled"};
-    template<typename _T> const char* order_names_<_T>::events[] =  { "TypeNone", "Accepted", "Canceled", "PartiallyFilled" };
+    template<typename _T> const char* order_names_<_T>::events[] =  { "EventNone", "Submitted", "Accepted", "Canceled", "PartiallyFilled", "Filled" };
     typedef order_names_<void> order_names_t;
     //@} order table names
     
@@ -141,7 +141,7 @@ namespace detail {
     struct Order::Event
     {
         typedef std::shared_ptr<Event> ptr_t;
-        enum Type { None = 0, Accepted = 1, Canceled = 2, PartiallyFilled = 3, Filled = 4 };
+        enum Type { EventNone = 0, Submitted=1, Accepted=2, Canceled=3, PartiallyFilled=4, Filled=5 };
         static const char* to_str(Type type) { return order_names_t::events[type]; }
 
         datetime_t datetime;

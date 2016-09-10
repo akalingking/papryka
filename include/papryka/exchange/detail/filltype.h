@@ -78,16 +78,16 @@ public:
     void on_order_filled(_Order& order);
 
     template <typename _Order>
-    info_ptr_t fill(_Order& order, const value_t& value, market_order_tag&);
+    info_ptr_t fill(_Order& order, const value_t& value, market_order_tag&&);
 
     template <typename _Order>
-    info_ptr_t fill(_Order& order, const value_t& bar, limit_order_tag&);
+    info_ptr_t fill(_Order& order, const value_t& bar, limit_order_tag&&);
 
     template <typename _Order>
-    info_ptr_t fill_stop_order(_Order& order, const value_t& bar, stop_order_tag&);
+    info_ptr_t fill(_Order& order, const value_t& bar, stop_order_tag&&);
 
     template <typename _Order>
-    info_ptr_t fill(_Order& order, const value_t& bar, stop_limit_order_tag&);
+    info_ptr_t fill(_Order& order, const value_t& bar, stop_limit_order_tag&&);
 
 private:    
     slippage_t slippage_;

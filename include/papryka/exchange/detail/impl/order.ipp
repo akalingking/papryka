@@ -75,24 +75,26 @@ void Order::switch_state(State newState)
 
 void Order::set_submitted(uint32_t id, const datetime_t& datetime)
 {
-    log_trace("Order::{} id current={}, new={} submiited_date={} (entry)", __func__, this->id, id, 
-            papryka::to_str(submitted_date));
+    log_trace("Order::{} id current={}, new={} submiited_date={} (entry)", __func__, this->id, id, papryka::to_str(submitted_date));
+    
     if (this->id == 0)
     {
         this->id = id;
         submitted_date = datetime;
-//        log_debug("Order::{} id={} submitted={}", __func__, id, ::papryka::to_str(datetime));
+        log_debug("Order::{} id={} submitted={}", __func__, id, ::papryka::to_str(datetime));
     }
     else
     {
         assert(false);
     }
+    
     log_trace("Order::{} (exit)", __func__);
 }
 
 void Order::add_info(info_ptr_t& info)
 {
     log_trace("Order::{} (entry)", __func__);
+    
     if (info->quantity > get_remaining())
     {
         std::stringstream strm;

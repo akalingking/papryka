@@ -16,44 +16,127 @@
  * @date        July 2, 2016 8:41 PM
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
-Dispatcher::Dispatcher() : is_stop_(false)
+Dispatcher::Dispatcher() : is_run_(false)
 {
+    log_debug("Dispatcher::{}", __func__);
 }
 
-void Dispatcher::add_subject(const ptr_t& ptr) 
+Dispatcher::~Dispatcher()
 {
-    subjects_.push_back(ptr);
-}
-
-void Dispatcher::run() 
-{
-    subjects_t::iterator iter;
-    for (iter=subjects_.begin(); iter != subjects_.end(); ++iter)
-        (*iter)->start();
+    log_trace("Dispatcher::{} entry", __func__);
+     
+    if (is_run())
+        stop();
     
-    start_event.emit();
-   
-    bool eof, dispatched;
-    while (!is_stop()) {
-        dispatched = dispatch_(eof);
-        if (eof)    
-            stop();
-        else if (!dispatched)
-            idle_event.emit();
+    if (thread_) 
+    {
+        if (thread_->joinable())
+            thread_->join();
+        else
+            thread_->detach();
     }
     
-    for (iter=subjects_.begin(); iter != subjects_.end(); ++iter)
-        (*iter)->stop();
-    
-    stop_event.emit();
+    log_trace("Dispatcher::{} exit", __func__);
 }
 
+bool Dispatcher::start() 
+{ 
+    if (!is_run_.load())
+    {
+        is_run_.store(true);
+        thread_.reset(new thread_t(&Dispatcher::do_work, this));
+    }
+    return is_run_;
+}
 
-bool Dispatcher::dispatch_subject_(ptr_t& ptr, const datetime_t& currentDate) 
+bool Dispatcher::stop() 
+{ 
+    if (is_run_.load())
+        is_run_.store(false);
+    return !is_run_.load();
+}
+
+bool Dispatcher::is_run() const
+{
+    return is_run_.load();
+}
+
+void Dispatcher::wait()
+{
+    std::unique_lock<mutex_t> lock(mutex_stop_);
+    cond_stop_.wait(lock);
+}
+
+bool Dispatcher::add_subject(const subject_ptr_t& ptr) 
 {
     bool ret = false;
+    if (!is_run_.load())
+    {
+        subjects_.push_back(ptr);
+        ret = true;
+    }
+    return ret;
+}
+
+void Dispatcher::do_work() 
+{
+//    log_debug("Dispatcher::{} (entry)", __func__);
+    try 
+    {
+        subjects_t::iterator iter;
+        for (iter=subjects_.begin(); iter != subjects_.end(); ++iter)
+            (*iter)->start();
+        
+        start_event.emit();
+        
+        bool eof, dispatched;
+        while (is_run_.load()) 
+        {
+            dispatched = dispatch_(eof);
+            if (eof) 
+            {    
+                is_run_.store(false);
+                break;
+            }
+            else if (!dispatched)
+            {
+                idle_event.emit();
+            }
+        }
+
+        for (iter=subjects_.begin(); iter != subjects_.end(); ++iter)
+            (*iter)->stop();
+
+        stop_event.emit();
+    }
+    catch (std::exception& e)
+    {
+        log_error("Dispatcher::{} exception='{}'", __func__, e.what());
+    }
+    catch (...)
+    {
+        log_error("Dispatcher::{} unknown exception", __func__);
+    }
+    
+    log_trace("Dispatcher::{} thread ended", __func__);
+    
+    std::unique_lock<mutex_t> lock(mutex_stop_);
+    cond_stop_.notify_all();
+    
+//    log_debug("Dispatcher::{} (exit)", __func__);
+}
+
+bool Dispatcher::dispatch_subject_(subject_ptr_t& ptr, const datetime_t& currentDate) 
+{
+//    log_trace("Dispatcher::{} (entry)", __func__);
+    
+    bool ret = false;
+    assert (ptr);
     if (!ptr->eof() && ptr->peek_date() <= currentDate)
         ret = ptr->dispatch();
+    
+//    log_trace("Dispatcher::{} (exit)", __func__);
+    
     return ret;
 }
 
@@ -66,7 +149,9 @@ bool Dispatcher::dispatch_(bool& eof)
     subjects_t::iterator iter;
     for (iter=subjects_.begin(); iter != subjects_.end(); ++iter) 
     {
-        ptr_t& ptr = *iter;
+        subject_ptr_t& ptr = *iter;
+        assert (ptr);
+
         if (!ptr->eof()) 
         {
             _eof = false;
@@ -78,13 +163,14 @@ bool Dispatcher::dispatch_(bool& eof)
         } 
     }
     
-    current_date = smallest_date;
+    current_date = smallest_date; 
     
     if (!_eof) 
     {
         for (iter=subjects_.begin(); iter != subjects_.end(); ++iter) 
         {
-            ptr_t& ptr = *iter;
+            subject_ptr_t& ptr = *iter;
+            assert (ptr);
             if (dispatch_subject_(ptr, smallest_date))
                 _dispatched = true;
         }

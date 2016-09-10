@@ -17,11 +17,18 @@
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
 #pragma once
+#include "logger.h"
 #include <vector>
 #include <functional>
 #include <memory>
 #include <tuple>
 #include <type_traits>
+#include <atomic>
+/**
+ * @caveat using volatile on plain boolean flag is causing segmentation fault.
+ * replacing with std::atomic<bool> fixes this error
+ */
+#define STL_ATOMIC
 
 namespace papryka {
 namespace detail {
@@ -39,8 +46,10 @@ namespace detail {
     template <int...I> struct index{};
     template <int N, int...I>
     struct sequence : sequence<N-1, N-1, I...> {};
+
     template <int... I>
     struct sequence<0, I...> : index<I...> {};
+
 
     template <typename _T> struct static_id { static uint32_t value; };
     template <typename _T> uint32_t static_id<_T>::value = 0;
@@ -97,21 +106,24 @@ class Event
 private:
     typedef std::shared_ptr<detail::Action_> action_t;
 
-    typedef std::vector<action_t, 
-        std::allocator<action_t>> subscribers_t;
+    typedef std::vector<action_t, std::allocator<action_t>> subscribers_t;
 
-    typedef std::vector<subscribers_t::iterator,
-        std::allocator<subscribers_t::iterator>> unsubscribers_t;
+    typedef std::vector<subscribers_t::iterator, std::allocator<subscribers_t::iterator>> unsubscribers_t;
 
     subscribers_t subscribers_;
     subscribers_t to_subscribe_;
     unsubscribers_t to_unsubscribe_;
 
-    bool is_emitting_;
-
+    // works but not guaranteed
+#ifndef STL_ATOMIC
+    volatile bool is_emitting_;
+#else
+    std::atomic<bool> is_emitting_;
+#endif
 public:
-    Event() : is_emitting_(false) {}
-
+    Event() : is_emitting_(false)  { log_trace("Event::{}", __func__); }
+    
+    ~Event() { log_trace("Event::{}", __func__); }
     /**
      * 
      * @param
@@ -122,7 +134,11 @@ public:
     uint32_t subscribe(void(T::*fp)(Args...), T* t)
     {
         action_t action(new Action < Args...>(fp, t));
+#ifndef STL_ATOMIC
         if (!is_emitting_)
+#else
+        if (!is_emitting_.load())
+#endif
             subscribers_.push_back(action);
         else
             to_subscribe_.push_back(action);
@@ -143,7 +159,12 @@ public:
 
         if ((*iter)->id_ == id)
         {
-            if (!is_emitting_)
+            
+#ifndef STL_ATOMIC
+        if (!is_emitting_)
+#else
+        if (!is_emitting_.load())
+#endif
                 subscribers_.erase(iter);
             else
                 to_unsubscribe_.push_back(iter);
@@ -153,14 +174,22 @@ public:
     template <typename...Args>
     void emit(Args&&...args)
     {
+#ifndef STL_ATOMIC
         is_emitting_ = true;
+#else
+        is_emitting_.store(true);
+#endif
         for (action_t& subscriber : subscribers_)
         {
             Action < Args...>* action = static_cast<Action < Args...>*> (subscriber.get());
             if (action != nullptr)
                 (*action)(std::forward<Args>(args)...);
         }
+#ifndef STL_ATOMIC
         is_emitting_ = false;
+#else
+        is_emitting_.store(false);
+#endif     
         apply_changes_();
     }
 

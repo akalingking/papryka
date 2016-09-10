@@ -133,6 +133,7 @@ public:
     typedef typename Traits<_T>::rows_t rows_t;
     typedef std::vector<Data> data_t;
     FeedSynthetic(datetime_t start, const datetime_t& end, Frequency frequency=Frequency::Day, size_t maxlen=1024);
+    ~FeedSynthetic();
     void add_values_from_generator(const data_t& data);
 
 private:
