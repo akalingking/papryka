@@ -23,8 +23,9 @@
 #include "order.h"
 
 namespace papryka {
-    
-class Exchange : public detail::Exchange<Bar>  
+ 
+template <typename _T=Bar>
+class Exchange : public detail::Exchange<_T>  
 {
 public:
     typedef std::shared_ptr<Exchange> ptr_t;
@@ -36,11 +37,12 @@ public:
     typedef typename base_t::order_t order_t;
     typedef typename base_t::order_ptr_t order_ptr_t;
 
-    inline Exchange(feed_ptr_t feed, real_t cash);
-    inline bool submit_order(order_ptr_t order);
-    inline bool cancel_order(uint32_t id);
-    inline real_t get_equity();
-    inline order_ptr_t create_order(order_t::Type type, order_t::Action action, const std::string& symbol, size_t quantity, 
+    Exchange(feed_ptr_t feed, real_t cash);
+    virtual ~Exchange();
+    bool submit_order(order_ptr_t order);
+    bool cancel_order(uint32_t id);
+    real_t get_equity();
+    order_ptr_t create_order(order_t::Type type, order_t::Action action, const std::string& symbol, size_t quantity, 
             bool isFillOnClose=false, real_t stopPrice=real_t(0), real_t limitPrice=real_t(0));
 
 private:
