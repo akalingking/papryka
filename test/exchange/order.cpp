@@ -36,7 +36,7 @@ TEST(Exchange, Order)
     
     // create bars
     datetime_t datetime = datetime_t::clock::now();
-    Bar bar(real_t(2), real_t(4), real_t(1), real_t(3), real_t(100));
+    Bar bar(real_t(2), real_t(4), real_t(1), real_t(3), real_t(0), real_t(100));
     values_t values;
     values.insert(values_t::value_type("GOOG", bar));
     
@@ -48,7 +48,7 @@ TEST(Exchange, Order)
     log_debug("Sample state string {}", order_t::to_str(order_t::Initial));
     
     fill_info_ptr_t ptr = order.process(fill, bar);
-    log_debug("fill info price={0:(precision::s_format)f} qty={1:(precision::s_format)f}", ptr->price, ptr->quantity);
+    log_debug("fill info price={} qty={}", ptr->price, ptr->quantity);
     EXPECT_EQ(ptr->price, 2);
     EXPECT_EQ(ptr->quantity, 1);
 }

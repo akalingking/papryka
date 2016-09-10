@@ -27,48 +27,91 @@
 
 using namespace papryka;
 
-class MyStrategy : public Strategy
+class StrategyTest : public Strategy<StrategyTest, Bar>
 {
 public:
-    typedef Strategy base_t;
+    typedef Strategy<StrategyTest, Bar> base_t;
     typedef base_t::exchange_ptr_t exchange_ptr_t;
     typedef base_t::value_t value_t;
     typedef base_t::values_t values_t;
     std::string symbol;
     
-    MyStrategy(exchange_ptr_t exchange, const std::string& symbol) :    
-            Strategy(exchange), symbol(symbol)
-    {}
+    StrategyTest(exchange_ptr_t exchange, const std::string& symbol) : base_t(exchange), symbol(symbol)
+    {
+        log_debug("StrategyTest::{}", __func__);
+    }
+    
+    ~StrategyTest() 
+    { 
+        log_debug("StrategyTest::{}", __func__); 
+    }
+    
+    void on_start()
+    {
+        log_debug("StrategyTest::{}", __func__);
+    }
+    
+    void on_idle()
+    {
+        log_debug("StrategyTest::{}", __func__);
+    }
+    
+    void on_stop()
+    {
+        log_debug("StrategyTest::{}", __func__);
+    }
+    
+    void on_order_updated(order_t* order)
+    {
+        log_debug("StrategyTest::{} order id={}", __func__, order->id);
+    }
     
     void on_bars(const datetime_t& datetime, const values_t& bars)
-    {
+    {     
         try
         {
             const value_t& bar = bars.at(symbol);
-            log_debug("MyStrategy::{0:} close={1:0.3f}", __func__, bar.close);
+            log_debug("StrategyTest::{} {}", __func__, bar);
         }
         catch (std::exception& e)
         {
-            log_error("Strategy::{} {}", __func__, e.what());
+            log_error("StrategyTest::{} {}", __func__, e.what());
         }
     } 
 };
 
 TEST(Strategy, basicConstruction)
 {
+    typedef FeedSynthetic<Bar> feed_t;
+    typedef Exchange<Bar> exchange_t;
+    typedef exchange_t::ptr_t exchange_ptr_t;
+    typedef StrategyTest strategy_t;
+    typedef std::shared_ptr<strategy_t> strategy_ptr_t;
+    
+    // 1. Mark stock symbol
     std::string symbol = "GOOG";
+
+    // 2. Create date interval of 100 days
     datetime_t end = Clock::now();
     datetime_t start = end - std::chrono::days(100);
-    
-    typedef FeedSynthetic<Bar> feed_t;
+
+    // 3. Construct data feed
     std::shared_ptr<feed_t> feed(new feed_t(start, end, Frequency::Day));
-    Bar goog_spot(771,773,770,772,1350000);
+
+    // 4.a. Construct spot bar price
+    Bar goog_spot(771, 773, 770, 772, 0, 1350000);
+    // 4.b. Set data table { symbol, spot price, volatility, expected return } 
     feed_t::data_t data = {{"GOOG", goog_spot, 0.2, 0.1}};
+    // 4.c. Generate synthetic data
     feed->add_values_from_generator(data);
-    
-    Exchange::ptr_t exchange(new Exchange(feed, 1000));
-    MyStrategy strategy(exchange, symbol); 
-    strategy.run();
-    
+
+    // 5. Construct exchange and set start equity
+    exchange_ptr_t exchange(new exchange_t(feed, 1000));
+
+    // 6. Build strategy
+    strategy_ptr_t strategy(new strategy_t(exchange, symbol)); 
+
+    // 7. Run simulation
+    strategy->run();
     EXPECT_EQ(0,0);
 }

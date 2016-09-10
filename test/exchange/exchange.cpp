@@ -41,10 +41,11 @@ TEST(Exchange, Exchange)
     
     feed->add_values_from_generator(data);
 
-    Exchange exchange(feed, 1000);
+    Exchange<Bar> exchange(feed, 1000);
     
     Dispatcher dispatcher;
     dispatcher.add_subject(feed);
-    dispatcher.run();
+    dispatcher.start();
+	dispatcher.wait();
     EXPECT_EQ(0,0);
 }

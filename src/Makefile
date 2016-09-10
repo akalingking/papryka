@@ -1,6 +1,6 @@
 include ../makefile.ubuntu
-LIBS := -lQuantLib
-INCLUDES := -I../include
+LIBS += -lQuantLib
+INCLUDES += -I../include
 	
 TARGET_DIR=../bin
 
@@ -24,7 +24,7 @@ all:    $(TARGETS)
 	@echo  '$(TARGETS)' done!
 
 clean:
-	$(RM) *~ $(TARGETS) $(OBJS) ../bin/examples/core* ../bin/examples/*.log
+	$(RM) *~ $(TARGETS) $(OBJS) ../bin/examples/core* ../bin/examples/*.log examples/feed/*.gcno
 
 depend: $(SRCS)
 	makedepend $(INCLUDES) $^

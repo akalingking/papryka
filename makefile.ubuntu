@@ -1,21 +1,12 @@
 CXX         = g++
 #CXXFLAGS   = -O2 -Wall -Wno-switch -Wreorder -Wunused-function -ggdb -std=c++11 -DNDEBUG -DREENTRANT
-CXXFLAGS    = -O2 -Wall -Wno-switch -Wno-reorder -Wno-unused-function -ggdb -std=c++11 -D_DEBUG -DREENTRANT -DPAPRYKA_DEBUG_ON -DPAPRYKA_TRACE_ON
+CXXFLAGS    = -O2 -Wall -Wno-switch -Wno-reorder -Wno-unused-function -ggdb -std=c++11 -D_DEBUG -DREENTRANT -DPAPRYKA_DEBUG_ON #-DPAPRYKA_TRACE_ON
 INCLUDES    = -I/usr/include -I/usr/local/include
 LFLAGS      = -L/usr/lib -L/usr/local/lib -L/usr/lib/x86_64-linux-gnu
 LIBS        = -lstdc++ -lpthread
 
 UNITTEST_ON=true
-COVERAGE_ON=true
-
-## Set unit test to true if flag does not exist
-ifeq ($(UNITTEST_ON),)
-    UNITTEST_ON = true
-endif
-## Set code coverage to true if flag does not exist
-ifeq ($(COVERAGE_ON),)
-    COVERAGE_ON = true
-endif
+COVERAGE_ON=false
 
 ## Flag to enable unit test execution
 ifeq ($(UNITTEST_ON),true)
