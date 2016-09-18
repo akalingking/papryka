@@ -17,6 +17,6 @@ REQUIREMENTS:
 [4] gcovr       "http://gcovr.com/"
 
 EXAMPLE:
-[Sample code here](https://github.com/akalingking/papryka/blob/master/test/strategy/strategybasic.cpp)
+[`Sample code here`](https://github.com/akalingking/papryka/blob/master/test/strategy/strategybasic.cpp)
 
 
