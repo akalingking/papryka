@@ -102,7 +102,14 @@ real_t Exchange<_T>::get_equity()
 
 template <typename _T>
 typename Exchange<_T>::order_ptr_t Exchange<_T>::create_order(order_t::Type type, order_t::Action action, const std::string& symbol, size_t quantity, 
-        bool isFillOnClose, real_t stopPrice, real_t limitPrice) 
+        bool isFillOnClose, real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone) 
 {
-    return order_ptr_t(new order_t(type, action, symbol, quantity, isFillOnClose, stopPrice, limitPrice));
+    order_ptr_t ptr(new order_t(type, action, symbol, quantity, isFillOnClose, stopPrice, limitPrice));
+    if (ptr)
+    {
+        ptr->is_good_till_canceled = isGoodTillCanceled;
+        ptr->is_all_or_none = isAllOrNone;
+        this->submit_order(ptr);
+    }
+    return ptr;
 }

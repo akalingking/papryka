@@ -43,7 +43,8 @@ public:
     bool cancel_order(uint32_t id);
     real_t get_equity();
     order_ptr_t create_order(order_t::Type type, order_t::Action action, const std::string& symbol, size_t quantity, 
-            bool isFillOnClose=false, real_t stopPrice=real_t(0), real_t limitPrice=real_t(0));
+            bool isFillOnClose=false, real_t stopPrice=real_t(0), real_t limitPrice=real_t(0), 
+            bool isGoodTillCanceled=false, bool isAllOrNone=false);
 
 private:
     template <typename _U> struct order_id { static uint32_t value; };

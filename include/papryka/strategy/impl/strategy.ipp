@@ -76,8 +76,8 @@ void Strategy<_D,_T>::on_order_event_(exchange_t& exchange, order_event_ptr_t or
     assert (order != nullptr);
     const uint32_t& order_id = order->id;
    
-    log_debug("Strategy::{} {} order id={} order event type={} order state={}", 
-            __func__, to_str(orderEvent->datetime), order_id, order_t::Event::to_str(orderEvent->type), order_t::to_str(order->state));
+    log_debug("Strategy::{} {} order id={} order type={} order event type={} order state={}", 
+            __func__, to_str(orderEvent->datetime), order_id, order_t::to_str(order->type), order_t::Event::to_str(orderEvent->type), order_t::to_str(order->state));
     
     (static_cast<_D&>(*this)).on_order_updated(order);
     

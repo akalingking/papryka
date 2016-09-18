@@ -67,7 +67,9 @@ public:
     }
     
     void on_bars(const datetime_t& datetime, const values_t& bars)
-    {     
+    {
+        log_trace("StrategyTest::{}", __func__);
+        
         try
         {
             const value_t& bar = bars.at(symbol);

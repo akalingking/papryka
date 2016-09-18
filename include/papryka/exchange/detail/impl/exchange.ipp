@@ -68,7 +68,8 @@ void Exchange<_T, _Fill, _Commission>::on_bars_imp(const datetime_t& datetime, c
 template <typename _T, typename _Fill, typename _Commission>
 void Exchange<_T, _Fill, _Commission>::process_order(const datetime_t& datetime, const value_t& value, order_t* order)
 {
-    log_debug("Exchange::{} order id={} qty={} current date={}", __func__, order->id, order->quantity, to_str(datetime));
+    log_debug("Exchange::{} order id={} qty={} current date={} type={} action={}", 
+            __func__, order->id, order->quantity, to_str(datetime), order_t::to_str(order->type), order_t::to_str(order->action));
 
     if (!pre_process_order(datetime, value, order))
         return;
@@ -145,7 +146,8 @@ void Exchange<_T, _Fill, _Commission>::post_process_order(const datetime_t& date
 template <typename _T, typename _Fill, typename _Commission>
 bool Exchange<_T, _Fill, _Commission>::commit_order_execution(const datetime_t& datetime, order_t* order, fill_info_t* fill)
 {
-    log_debug("Exchange::{} date={} id={} order qty={}, filled={}, new fill={}", __func__, papryka::to_str(datetime), order->id, order->quantity, order->filled, fill->quantity);
+    log_debug("Exchange::{} date={} id={} order qty={}, filled={}, new fill={} at price={}", __func__, 
+            papryka::to_str(datetime), order->id, order->quantity, order->filled, fill->quantity, fill->price);
 
     bool ret = false;
     real_t price = fill->price;
