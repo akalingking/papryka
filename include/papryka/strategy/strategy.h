@@ -86,25 +86,29 @@ public:
             bool isGoodTillCanceled=false, real_t stopPrice=real_t(0), real_t limitPrice=real_t(0));
     
     // arrg needs to write this as many, interface for custom strategies
-    position_t* enter_long(const std::string& symbol, size_t quantity, bool isGoodTillCanceled=false, bool isAllOrNone=false);
-    position_t* enter_short(const std::string& symbol, size_t quantity, bool isGoodTillCanceled=false, bool isAllOrNone=false);
-    position_t* enter_long_stop(const std::string& symbol,size_t quantity, real_t stopPrice, bool isGoodTillCanceled=false, bool isAllOrNone=false);
-    position_t* enter_short_stop(const std::string& symbol, size_t quantity, real_t stopPrice, bool isGoodTillCanceled=false, bool isAllOrNone=false);
-    position_t* enter_long_limit(const std::string& symbol, size_t quantity, real_t limitPrice, bool isGoodTillCanceled=false, bool isAllOrNone=false);
-    position_t* enter_short_limit(const std::string& symbol, size_t quantity, real_t limitPrice, bool isGoodTillCanceled=false, bool isAllOrNone=false);
-    position_t* enter_long_stop_limit(const std::string& symbol, size_t quantity, real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled=false, bool isAllOrNone=false);
-    position_t* enter_short_stop_limit(const std::string& symbol, size_t quantity, real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled=false, bool isAllOrNone=false);
-    // implemented by custom strategies
-    virtual void on_enter(position_t* pos) {};
-    virtual void on_enter_canceled(position_t* pos) {};
-    virtual void on_exit(position_t* pos) {};
-    virtual void on_exit_canceled(position_t* pos) {};
+    position_ptr_t enter_long(const std::string& symbol, size_t quantity, bool isGoodTillCanceled=false, bool isAllOrNone=false);
+    position_ptr_t enter_short(const std::string& symbol, size_t quantity, bool isGoodTillCanceled=false, bool isAllOrNone=false);
+    position_ptr_t enter_long_stop(const std::string& symbol,size_t quantity, real_t stopPrice, bool isGoodTillCanceled=false, bool isAllOrNone=false);
+    position_ptr_t enter_short_stop(const std::string& symbol, size_t quantity, real_t stopPrice, bool isGoodTillCanceled=false, bool isAllOrNone=false);
+    position_ptr_t enter_long_limit(const std::string& symbol, size_t quantity, real_t limitPrice, bool isGoodTillCanceled=false, bool isAllOrNone=false);
+    position_ptr_t enter_short_limit(const std::string& symbol, size_t quantity, real_t limitPrice, bool isGoodTillCanceled=false, bool isAllOrNone=false);
+    position_ptr_t enter_long_stop_limit(const std::string& symbol, size_t quantity, real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled=false, bool isAllOrNone=false);
+    position_ptr_t enter_short_stop_limit(const std::string& symbol, size_t quantity, real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled=false, bool isAllOrNone=false);
+    
+    // implemented by custom strategies, called from statemachine
+    void on_enter(position_t* pos) { (static_cast<_D&>(*this)).on_enter(pos); };
+    void on_enter_canceled(position_t* pos) { (static_cast<_D&>(*this)).on_enter_canceled(pos); };
+    void on_exit(position_t* pos) { (static_cast<_D&>(*this)).on_exit(pos); };
+    void on_exit_canceled(position_t* pos) { (static_cast<_D&>(*this)).on_exit_canceled(pos); };
+    
+    size_t active_position_size() const;
+    size_t order_to_position_size() const;
     
 protected:
-    positions_t active_positions_;
     Dispatcher dispatcher_;
 //    symbol_to_values_t prices_;
     order_to_position_t order_to_position_;
+    positions_t active_positions_;
     
 private:
     void on_order_event_(exchange_t& exchange, order_event_ptr_t orderEvent);
@@ -144,8 +148,8 @@ public:
     typedef typename order_t::info_ptr_t order_info_ptr_t;
     typedef typename std::map<uint32_t, order_ptr_t> orders_t;
     
-    enum State { StateIdle=1, StateOpen=2, StateClose=3 };
-    enum Direction { LongOnly=1, ShortOnly=2, LongShort=3 };
+    enum State { StateIdle, StateOpen, StateClose };
+    enum Direction { LongOnly, ShortOnly, LongShort };
     
     static const char* to_str(State e) { return statics_t::states[e]; }
     static const char* to_str(Direction e) { return statics_t::directions[e]; }
@@ -161,7 +165,9 @@ public:
     order_ptr_t exit_order;
     bool is_all_or_none;
     bool is_good_till_canceled;
-
+    orders_t active_orders_;
+    real_t shares_;
+    
     virtual ~Position();
     const std::string& get_symbol() const;
     const Milliseconds get_age() const;
@@ -186,10 +192,8 @@ public:
     void on_order_event(order_event_ptr_t orderEvent);
 
 protected:
-    orders_t active_orders_;
     std::unique_ptr<Tracker> tracker_;
     std::unique_ptr<StateMachine> statemachine_;
-    real_t shares_;
     
     Position(Strategy& strategy, bool goodTillCanceled, bool isAllOrNone, Direction direction, Market::Type type = Market::Stock);    
     void update_pos_tracker(order_event_t& orderEvent);

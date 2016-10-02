@@ -45,7 +45,6 @@ TEST(Exchange, Exchange)
     
     Dispatcher dispatcher;
     dispatcher.add_subject(feed);
-    dispatcher.start();
-	dispatcher.wait();
+    dispatcher.run();
     EXPECT_EQ(0,0);
 }

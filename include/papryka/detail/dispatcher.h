@@ -53,6 +53,7 @@ public:
     inline bool stop();
     inline bool start();
     inline void wait();
+    inline void run();
 
 private:
     inline bool is_run() const;

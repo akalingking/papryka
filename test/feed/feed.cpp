@@ -38,7 +38,8 @@ TEST(Feed, Float)
     
     Dispatcher dispatcher;
     dispatcher.add_subject(feed);
-    dispatcher.run();
+    dispatcher.start();
+    dispatcher.wait();
     
     EXPECT_EQ(0,0);
 }

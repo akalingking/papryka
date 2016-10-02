@@ -21,8 +21,8 @@ void Exchange<_T, _Fill, _Commission>::unregister_order(uint32_t id)
 template <typename _T, typename _Fill, typename _Commission>
 void Exchange<_T, _Fill, _Commission>::on_bars(const datetime_t& datetime, const values_t& values)
 {
-    log_trace("Exchange:{} {}", __func__, to_str(datetime));
-    fillstrategy.on_bars(datetime, values);
+    log_trace("Exchange:{} {}", __func__, to_str(datetime));    
+	fillstrategy.on_bars(datetime, values);
     typename orders_t::iterator iter = orders_.begin();
     for (; iter != orders_.end(); ++iter)
         on_bars_imp(datetime, values, iter->second.get());
@@ -146,8 +146,9 @@ void Exchange<_T, _Fill, _Commission>::post_process_order(const datetime_t& date
 template <typename _T, typename _Fill, typename _Commission>
 bool Exchange<_T, _Fill, _Commission>::commit_order_execution(const datetime_t& datetime, order_t* order, fill_info_t* fill)
 {
-    log_debug("Exchange::{} date={} id={} order qty={}, filled={}, new fill={} at price={}", __func__, 
-            papryka::to_str(datetime), order->id, order->quantity, order->filled, fill->quantity, fill->price);
+    log_trace("Exchange::{} date={} id={} order type={} action={} qty={}, filled={}, new fill={} at price={}", __func__, 
+            papryka::to_str(datetime), order->id, order_t::to_str(order->type), order_t::to_str(order->action), 
+            order->quantity, order->filled, fill->quantity, fill->price);
 
     bool ret = false;
     real_t price = fill->price;

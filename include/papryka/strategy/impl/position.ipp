@@ -159,6 +159,7 @@ struct Strategy<_D,_T>::Position::StateMachine
     State state;
     
     inline StateMachine(Position& position);
+    inline ~StateMachine();
     inline void switch_state(State newState);
     inline bool is_open() const;
     inline bool can_submit_order(order_t& order);
@@ -194,7 +195,9 @@ void Strategy<_D,_T>::Position::submit_and_register_order(order_ptr_t order)
         return;
     }
     
-    strategy.exchange->submit_order(order);
+    if (!order->is_submitted())
+        strategy.exchange->submit_order(order);
+    
     strategy.register_position_order(id, order->id);
     active_orders_[order->id] = order;
 }
@@ -202,7 +205,6 @@ void Strategy<_D,_T>::Position::submit_and_register_order(order_ptr_t order)
 template <typename _D, typename _T>
 void Strategy<_D,_T>::Position::submit_exit_order(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled)
 {
-    assert (is_entry_active());
     assert (!is_exit_active());
     
     exit_order = build_exit_order(stopPrice, limitPrice);
@@ -216,10 +218,11 @@ void Strategy<_D,_T>::Position::submit_exit_order(real_t stopPrice, real_t limit
 template <typename _D, typename _T>
 void Strategy<_D,_T>::Position::on_order_event(order_event_ptr_t orderEvent)
 {   
-    log_trace("Position:{} {} id={} event={}", __func__,
-        papryka::to_str(orderEvent->datetime), id, order_t::Event::to_str(orderEvent->type));
+    log_trace("Position:{} {} id={} event={} order type={} action={}", __func__,
+            papryka::to_str(orderEvent->datetime), id, order_t::Event::to_str(orderEvent->type),
+            order_t::to_str(orderEvent->order->type), 
+            order_t::to_str(orderEvent->order->action));
     
-    assert (statemachine_->state);
     assert (orderEvent->order);
     
 //    update_pos_tracker_(*orderEvent);
@@ -246,8 +249,10 @@ void Strategy<_D,_T>::Position::on_order_event(order_event_ptr_t orderEvent)
         else
             shares_ -= precision::round(info->quantity);
 
-        log_debug("Position::{0:} {1:} id={2:} event={3:} order price={4:} order size={5:0.3f} current share(s)={6:0.3f}", 
-                __func__, papryka::to_str(orderEvent->datetime), id, order_t::Event::to_str(orderEvent->type), info->price, info->quantity, shares_);
+        log_trace("Position::{} {} id={} event={} order type={} action={} price={} size={} current share(s)={} order info date={}", 
+                __func__, papryka::to_str(orderEvent->datetime), id, order_t::Event::to_str(orderEvent->type),
+                order_t::to_str(order->type), order_t::to_str(order->action),
+                info->price, info->quantity, shares_, papryka::to_str(info->datetime));
     }
     
     statemachine_->on_order_event(*orderEvent.get());
@@ -297,6 +302,7 @@ bool Strategy<_D,_T>::Position::is_exit_filled() const
 template <typename _D, typename _T>
 bool Strategy<_D,_T>::Position::is_open() const
 {
+    log_trace("Strategy::Position::{} state={}",__func__, to_str(statemachine_->state));
     return statemachine_->is_open();
 }
 
@@ -323,6 +329,7 @@ void Strategy<_D,_T>::Position::cancel_exit()
 template <typename _D, typename _T>
 void Strategy<_D,_T>::Position::exit_market(bool goodTillCanceled) 
 { 
+    assert (statemachine_.get());
     statemachine_->exit(0, 0, goodTillCanceled);
 }
 
@@ -418,12 +425,12 @@ LongPosition<_D,_T>::LongPosition(strategy_t& strategy, const std::string& symbo
     }
     
     base_t::entry_order->is_all_or_none = isAllOrNone;
+
     base_t::entry_order->is_good_till_canceled = isGoodTillCanceled;
     
     base_t::tracker_.reset(new typename base_t::Tracker());
     
     base_t::submit_and_register_order(base_t::entry_order);
-    strategy.register_position(base_t::Position::ptr_t(this));
     
     base_t::statemachine_->switch_state(base_t::StateIdle);
     
@@ -433,7 +440,7 @@ LongPosition<_D,_T>::LongPosition(strategy_t& strategy, const std::string& symbo
 template <typename _D, typename _T>
 LongPosition<_D,_T>::~LongPosition()
 {
-    log_trace("LongPositin::{} id={}", __func__, base_t::id);
+    log_trace("LongPosition::{} id={}", __func__, base_t::id);
 }
 
 template <typename _D, typename _T>
@@ -492,10 +499,10 @@ ShortPosition<_D,_T>::ShortPosition(strategy_t& strategy, const std::string& sym
         assert (false);
     
     this->entry_order->is_all_or_none = isAllOrNone;
+
     this->entry_order->is_good_till_canceled = isGoodTillCanceled;
     
     this->submit_and_register_order(this->entry_order);
-    this->strategy.register_position(base_t::Position::ptr_t(this));
     
     this->statemachine_->switch_state(base_t::StateIdle);
     
@@ -511,7 +518,7 @@ ShortPosition<_D,_T>::~ShortPosition()
 template <typename _D, typename _T>
 typename ShortPosition<_D,_T>::order_ptr_t ShortPosition<_D,_T>::build_exit_order(real_t stopPrice, real_t limitPrice)
 {
-    log_trace("ShortPosition<_D,_T>::{0:} id={} stop={} limit={}", __func__, this->id, stopPrice, limitPrice);
+    log_trace("ShortPosition<_D,_T>::{} id={} stop={} limit={}", __func__, this->id, stopPrice, limitPrice);
     
     std::string symbol = this->get_symbol();
     size_t quantity = this->shares_ * -1;

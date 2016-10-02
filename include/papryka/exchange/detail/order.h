@@ -132,7 +132,7 @@ namespace detail {
         Error error;
 
         Info(real_t price, size_t quantity, real_t commission, const datetime_t& datetime) : price(price), quantity(quantity), commission(commission), datetime(datetime), error(ErrorNone)
-        { log_trace("order::info::{}", __func__); }
+        { log_trace("order::info::{} datetime={}", __func__, papryka::to_str(datetime)); }
         ~Info() { log_trace("order::info::{}", __func__); }
         Info() : error(ErrorNone), price(0), quantity(0), commission(0) { log_trace("order::info::{}", __func__); }
         Info(Error error) : error(error), price(0), quantity(0), commission(0) { log_trace("order::info::{}", __func__); }

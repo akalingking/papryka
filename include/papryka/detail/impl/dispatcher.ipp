@@ -61,6 +61,12 @@ bool Dispatcher::is_run() const
     return is_run_.load();
 }
 
+void Dispatcher::run() 
+{
+    if (start())
+        wait();
+}
+
 void Dispatcher::wait()
 {
     std::unique_lock<mutex_t> lock(mutex_stop_);

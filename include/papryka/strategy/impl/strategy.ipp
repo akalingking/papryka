@@ -30,21 +30,16 @@ Strategy<_D,_T>::Strategy(exchange_ptr_t exchange) : feed(exchange->feed), excha
     
     dispatcher_.stop_event.subscribe(&Strategy<_D,_T>::on_stop_, this);
     
-    // Exchange must dispatch events first, especially when backtesting.
-    // exchange now should be driven by feed events
-    // dispatcher_.add_subject(exchange_);
-    
     dispatcher_.add_subject(feed);
     
-    log_debug("Strategy<{}>::{}", type_name<_D>(), __func__);
+    log_trace("Strategy<{}>::{}", type_name<_D>(), __func__);
 }
 
 template <typename _D, typename _T>
 Strategy<_D,_T>::~Strategy()
 {
-    log_debug("Strategy<{}>::{} entry", type_name<_D>(), __func__);
+    log_trace("Strategy<{}>::{}", type_name<_D>(), __func__);
     exchange.reset();
-    log_debug("Strategy<{}>::{} exit", type_name<_D>(), __func__);
 }
 
 template <typename _D, typename _T>
@@ -76,8 +71,9 @@ void Strategy<_D,_T>::on_order_event_(exchange_t& exchange, order_event_ptr_t or
     assert (order != nullptr);
     const uint32_t& order_id = order->id;
    
-    log_debug("Strategy::{} {} order id={} order type={} order event type={} order state={}", 
-            __func__, to_str(orderEvent->datetime), order_id, order_t::to_str(order->type), order_t::Event::to_str(orderEvent->type), order_t::to_str(order->state));
+    log_trace("Strategy::{} {} order id={} order type={} action={} order event type={} order state={}", 
+            __func__, to_str(orderEvent->datetime), order_id, order_t::to_str(order->type), order_t::to_str(order->action), 
+            order_t::Event::to_str(orderEvent->type), order_t::to_str(order->state));
     
     (static_cast<_D&>(*this)).on_order_updated(order);
     
@@ -187,52 +183,82 @@ typename Strategy<_D,_T>::order_ptr_t Strategy<_D,_T>::create_order(typename ord
 }
     
 template <typename _D, typename _T>
-typename Strategy<_D,_T>::position_t* Strategy<_D,_T>::enter_long(const std::string& symbol, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone)
+typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_long(const std::string& symbol, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new LongPosition<_D,_T>(*this, symbol, real_t(0), real_t(0), quantity, isGoodTillCanceled, isAllOrNone);
+    position_ptr_t ptr(new LongPosition<_D,_T>(*this, symbol, real_t(0), real_t(0), quantity, isGoodTillCanceled, isAllOrNone));
+    this->register_position(ptr);
+    return ptr;
 }
 
 template <typename _D, typename _T>
-typename Strategy<_D,_T>::position_t* Strategy<_D,_T>::enter_short(const std::string& symbol, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone)
+typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_short(const std::string& symbol, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new ShortPosition<_D,_T>(*this, symbol, real_t(0), real_t(0), quantity, isGoodTillCanceled, isAllOrNone);
+    position_ptr_t ptr(new ShortPosition<_D,_T>(*this, symbol, real_t(0), real_t(0), quantity, isGoodTillCanceled, isAllOrNone));
+    this->register_position(ptr);
+    return ptr;
 }
 
 template <typename _D, typename _T>
-typename Strategy<_D,_T>::position_t* Strategy<_D,_T>::enter_long_stop(const std::string& symbol, size_t quantity, real_t stopPrice, bool isGoodTillCanceled, bool isAllOrNone)
+typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_long_stop(const std::string& symbol, size_t quantity, real_t stopPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new LongPosition<_D,_T>(*this, symbol, stopPrice, real_t(0), quantity, isGoodTillCanceled, isAllOrNone);
+    position_ptr_t ptr(new LongPosition<_D,_T>(*this, symbol, stopPrice, real_t(0), quantity, isGoodTillCanceled, isAllOrNone));
+    this->register_position(ptr);
+    return ptr;
 }
 
 template <typename _D, typename _T>
-typename Strategy<_D,_T>::position_t* Strategy<_D,_T>::enter_short_stop(const std::string& symbol, size_t quantity, real_t stopPrice, bool isGoodTillCanceled, bool isAllOrNone)
+typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_short_stop(const std::string& symbol, size_t quantity, real_t stopPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new ShortPosition<_D,_T>(*this, symbol, stopPrice, real_t(0), quantity, isGoodTillCanceled, isAllOrNone);
+    position_ptr_t ptr(new ShortPosition<_D,_T>(*this, symbol, stopPrice, real_t(0), quantity, isGoodTillCanceled, isAllOrNone));
+    this->register_position(ptr);
+    return ptr;
 }
 
 template <typename _D, typename _T>
-typename Strategy<_D,_T>::position_t* Strategy<_D,_T>::enter_long_limit(const std::string& symbol, size_t quantity, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
+typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_long_limit(const std::string& symbol, size_t quantity, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new LongPosition<_D,_T>(*this, symbol, real_t(0), limitPrice, quantity, isGoodTillCanceled, isAllOrNone);
+    position_ptr_t ptr(new LongPosition<_D,_T>(*this, symbol, real_t(0), limitPrice, quantity, isGoodTillCanceled, isAllOrNone));
+    this->register_position(ptr);
+    return ptr;
 }
 
 template <typename _D, typename _T>
-typename Strategy<_D,_T>::position_t* Strategy<_D,_T>::enter_short_limit(const std::string& symbol, size_t quantity, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
+typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_short_limit(const std::string& symbol, size_t quantity, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new ShortPosition<_D,_T>(*this, symbol, real_t(0), limitPrice, quantity, isGoodTillCanceled, isAllOrNone);
+    position_ptr_t ptr(new ShortPosition<_D,_T>(*this, symbol, real_t(0), limitPrice, quantity, isGoodTillCanceled, isAllOrNone));
+    this->register_position(ptr);
+    return ptr;
 }
 
 template <typename _D, typename _T>
-typename Strategy<_D,_T>::position_t* Strategy<_D,_T>::enter_long_stop_limit(const std::string& symbol, size_t quantity, 
+typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_long_stop_limit(const std::string& symbol, size_t quantity, 
         real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new LongPosition<_D,_T>(*this, symbol, stopPrice, limitPrice, quantity, isGoodTillCanceled, isAllOrNone);
+    position_ptr_t ptr(new LongPosition<_D,_T>(*this, symbol, stopPrice, limitPrice, quantity, isGoodTillCanceled, isAllOrNone));
+    this->register_position(ptr);
+    return ptr;
 }
 
 template <typename _D, typename _T>
-typename Strategy<_D,_T>::position_t* Strategy<_D,_T>::enter_short_stop_limit(const std::string& symbol, size_t quantity, 
+typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_short_stop_limit(const std::string& symbol, size_t quantity, 
         real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
-    return new ShortPosition<_D,_T>(*this, symbol, stopPrice, limitPrice, quantity, isGoodTillCanceled, isAllOrNone);
+    position_ptr_t ptr(new ShortPosition<_D,_T>(*this, symbol, stopPrice, limitPrice, quantity, isGoodTillCanceled, isAllOrNone));
+    this->register_position(ptr);
+    return ptr;
+}
+
+template <typename _D, typename _T>
+size_t Strategy<_D,_T>::active_position_size() const
+{
+    // might need protection
+    return active_positions_.size();
+}
+
+template <typename _D, typename _T>
+size_t Strategy<_D,_T>::order_to_position_size() const
+{
+    // might need protection
+    return order_to_position_.size();
 }
 

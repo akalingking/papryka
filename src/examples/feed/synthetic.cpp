@@ -43,7 +43,6 @@ int main(int argc, char** argv)
     
     Dispatcher dispatcher;
     dispatcher.add_subject(ptr);
-    dispatcher.start();
-	dispatcher.wait();
+    dispatcher.run();
     return 0;
 }
