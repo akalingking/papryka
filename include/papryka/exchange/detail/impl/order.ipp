@@ -27,9 +27,9 @@ template <typename _T> Order::StateTable Order::state_table<_T>::value[] = {
 Order::Order(Type type, Action action, const std::string& symbol, size_t quantity) :
         id(0), type(type), action(action), symbol(symbol), quantity(quantity), state(Initial),
         filled(0), avg_fill_price(0.0), is_all_or_none(false), is_good_till_canceled(false), commissions(0.0),
-        submitted_date(nulldate)
+        submitted_date(nulldate), info(nullptr)
 {
-    log_trace("detail::Order::{}", __func__);
+    log_trace("detail::Order::{} type={} action={}", __func__, to_str(type), to_str(action));
 }
 
 Order::~Order()
@@ -93,7 +93,7 @@ void Order::set_submitted(uint32_t id, const datetime_t& datetime)
 
 void Order::add_info(info_ptr_t& info)
 {
-    log_trace("Order::{} (entry)", __func__);
+    log_trace("Order::{} id={} datetime={} (entry)", __func__, id, papryka::to_str(info->datetime));
     
     if (info->quantity > get_remaining())
     {

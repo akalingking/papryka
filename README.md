@@ -1,9 +1,9 @@
 
-#PAPRYKA v2.0 - Trading System - Strategy Backtester
+# PAPRYKA v2.0 - Trading System - Strategy Backtester #
 
 Status: Pre-Alpha
 
-##FEATURES:
+## FEATURES ##
 
 * Trading system platform
 
@@ -14,7 +14,7 @@ Status: Pre-Alpha
 * To use just copy header directory and start building trade strategies, see test files for reference.
 
 
-##REQUIREMENTS:
+## REQUIREMENTS ##
 
 [1] spdlg       "https://github.com/gabime/spdlog"
 
@@ -24,7 +24,7 @@ Status: Pre-Alpha
 
 [4] gcovr       "http://gcovr.com/"
 
-##EXAMPLE:
+##EXAMPLE ##
 
 [`Sample code here`](https://github.com/akalingking/papryka/blob/master/test/strategy/strategybasic.cpp)
 
