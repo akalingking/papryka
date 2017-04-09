@@ -24,7 +24,7 @@ Status: Pre-Alpha
 
 [4] gcovr       "http://gcovr.com/"
 
-##EXAMPLE ##
+## EXAMPLE ##
 
 [`Sample code here`](https://github.com/akalingking/papryka/blob/master/test/strategy/strategybasic.cpp)
 
