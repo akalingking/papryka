@@ -41,5 +41,5 @@ struct Traits
     // need the push and pop property for handling cached timeseries.
     typedef std::deque<row_t, _Alloc> rows_t;
 };
- 
+
 }

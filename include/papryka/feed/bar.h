@@ -37,12 +37,13 @@ namespace papryka {
             else if (low > close)
                 throw std::logic_error("Low > Close");
         } 
+
         real_t open;
         real_t high;
         real_t low;
         real_t close;
         real_t closeadj;
-        real_t volume; 
+        real_t volume;
     };
     
     inline real_t get_adjusted(real_t value, real_t close, real_t adjClose) 
@@ -59,7 +60,8 @@ namespace papryka {
         return (bar.high + bar.low + bar.close) / 3;
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const Bar& bar) {
+    inline std::ostream& operator<<(std::ostream& os, const Bar& bar)
+    {
         os << std::fixed << std::setprecision(papryka::precision::s_precision) << "o:" << bar.open << " h:" << bar.high << " l:" << bar.low << " c:" << bar.close  << " adj:" << bar.closeadj << " v:"  << bar.volume;
         return os;
     }

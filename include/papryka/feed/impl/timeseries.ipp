@@ -16,6 +16,7 @@
  * @date        July 2, 2016 10:42 PM
  * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
  */
+ 
 template<typename _T, typename _Alloc>
 Timeseries<_T,_Alloc>::Timeseries(Frequency frequency, size_t maxlen, Event* eventSource) : 
     frequency(frequency), maxlen(maxlen) 
@@ -85,7 +86,7 @@ template<typename _T, typename _Alloc>
 typename Timeseries<_T,_Alloc>::row_t& 
 Timeseries<_T,_Alloc>::operator[](size_t i)
 {
-    int size = (int)rows_.size();
+    size_t size = (int)rows_.size();
 
     if ((i > 0 && i >= size) || (i < 0 && (i+size) < 0) || size == 0) 
         throw std::out_of_range("out of range");

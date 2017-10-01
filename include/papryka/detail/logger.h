@@ -18,6 +18,11 @@
  */
 #pragma once
 #include <spdlog/spdlog.h>
+/**
+ * @note user defined ostream operator seems to be failing on recent spdlog version
+ * add this header to fix
+ */
+#include <spdlog/fmt/ostr.h>
 #include <memory>
 #include <cassert>
 
@@ -55,17 +60,17 @@ public:
             }
 
             std::shared_ptr<spdlog::sinks::rotating_file_sink_mt> sink = std::make_shared<
-                spdlog::sinks::rotating_file_sink_mt>(file, ext, 1024 * 100 * 5, 5, false);
-
+                spdlog::sinks::rotating_file_sink_mt>(file+ext, 1024 * 100 * 5, 5);
+            
             logger = std::make_shared<spdlog::logger>(name, sink);
 
             spdlog::register_logger(logger);
 
-            //            logger = spdlog::rotating_logger_mt(name, filepath, 1048576 * 5, 3);
+            // logger = spdlog::rotating_logger_mt(name, filepath, 1048576 * 5, 3);
         }
         else
         {
-            logger = spdlog::stdout_logger_mt(name, true);
+            logger = spdlog::stdout_logger_mt(name);//, true);
         }
 
         logger->set_level(logLevel);
@@ -81,15 +86,15 @@ public:
     {
         if (g_debug_logger == 0)
         {
-            
             static std::shared_ptr<spdlog::logger> logger;
-            if (!logger.get()) 
+            if (!logger.get())
             {
-                logger = spdlog::stdout_logger_mt("_debug_", true);
+                logger = spdlog::stdout_logger_mt("_debug_");
                 logger->set_level(spdlog::level::trace);
             }
             g_debug_logger = logger.get();
         }
+
         assert(g_debug_logger);
         return g_debug_logger;
     }
@@ -108,7 +113,7 @@ public:
 #ifdef PAPRYKA_DEBUG_ON
     template <typename...Args> static void log_debug(const char* fmt, const Args&...args)
     {
-        get_debug_logger()->debug(fmt, args...);
+    	get_debug_logger()->debug(fmt, args...);
     }
 #else
 
