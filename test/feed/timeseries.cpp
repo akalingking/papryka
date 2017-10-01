@@ -19,6 +19,8 @@
 #include <gtest/gtest.h>
 #include <papryka/papryka.h>
 #include <papryka/feed/timeseries.h>
+#include <papryka/feed/matrix.h>
+//#include <papryka/feed/bartimeseries.h>
  
 using namespace papryka;
 

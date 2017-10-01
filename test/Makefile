@@ -1,6 +1,6 @@
 include ../makefile.ubuntu
 
-LIBS += -lQuantLib
+LIBS += -lQuantLib 
 INCLUDES += -I../include
 	
 TARGETDIR=../bin
@@ -17,7 +17,8 @@ FEED=test_feed
 FEED_TARGET=$(TARGETDIR)/$(FEED)
 FEED_SRCS=./main.cpp \
 ./feed/bar.cpp \
-./feed/timeseries.cpp
+./feed/timeseries.cpp \
+./feed/bartimeseries.cpp
 FEED_OBJS = $(FEED_SRCS:.cpp=.o)
 
 EXCHANGE=test_exchange	
@@ -71,7 +72,7 @@ depend: $(SRCS)
 	
 #@{ builds	
 $(SANITY_TARGET): $(SANITY_OBJS) 
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(SANITY_TARGET) $(SANITY_OBJS) $(LFLAGS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(SANITY_TARGET) $(SANITY_OBJS) $(LFLAGS) $(LIBS) 
 $(SANITY): $(SANITY_TARGET)
 
 $(DETAIL_TARGET): $(DETAIL_OBJS) 

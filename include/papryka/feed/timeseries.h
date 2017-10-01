@@ -25,11 +25,13 @@
 #include <memory>
 #include <deque>
 #include <exception>
+#include <type_traits>
+#include "bar.h"
 
 namespace papryka {
 
 static const constexpr size_t s_timeseries_max_len = 1024*20;
-    
+
 template<typename _T=real_t, typename _Alloc=std::allocator<_T> >
 class Timeseries
 {
@@ -56,9 +58,17 @@ public:
     void push_back(const row_t& row);
     row_t pop_front();
     const row_t& operator[](size_t pos) const;
-    row_t& operator[](size_t pos);        
+    row_t& operator[](size_t pos);
+    size_t column_size() const { return column_size_<_T>(); }
 
 private:
+    // overloads
+    template <typename _U, typename _K=std::enable_if_t<(std::is_arithmetic<_U>::value) || (std::is_same<_U, Bar>::value), real_t>>
+	size_t column_size_() const { return (std::is_same<_U, Bar>::value) ? 5 : 1; }
+
+    template <typename _U, typename _K=std::enable_if_t<(!std::is_arithmetic<_U>::value) && (!std::is_same<_U, Bar>::value), _U>>
+    size_t column_size_(_K* k=0) const { return std::tuple_size<_U>::value; }
+
     void on_new_value_(const row_t& row);
     rows_t rows_;
 };

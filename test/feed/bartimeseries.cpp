@@ -17,17 +17,25 @@
  * @copyright   (c) 2016-2027 <www.sequenceresearch.com>
  */
 #include <gtest/gtest.h>
-#include <papryka/detail/date.h>
-#include <papryka/feed/bar.h>
- 
+#include <papryka/papryka.h>
+#include <papryka/feed/bartimeseries.h>
+
 using namespace papryka;
-TEST(Feed, bartimeseries)
+
+TEST(Bartimeseries, custom_bar)
 {
-    Bar bar(2,4,1,3);
+	typedef Timeseries<Bar> timeseries_t;
+	timeseries_t::row_t row;
+	timeseries_t ts(Frequency::Day);
+	Bar bar1(2.0, 3.0, 1.0, 2.1, 5, 10);
+	row = timeseries_t::row_t(Clock::now(), bar1);
+	ts.push_back(row);
+	EXPECT_EQ(ts.size(), 1);
+	EXPECT_EQ(ts.column_size(), 5);
 
-    EXPECT_EQ(bar.open,2);
-    EXPECT_EQ(bar.high,4);
-    EXPECT_EQ(bar.low,1);
-    EXPECT_EQ(bar.close,3);
-
+	Bar bar2(2.0, 3.0, 1.0, 2.1, 5, 10);
+	row = timeseries_t::row_t(Clock::now(), bar2);
+	ts.push_back(row);
+	EXPECT_EQ(ts.size(), 2);
+	EXPECT_EQ(ts.column_size(), 5);
 }
