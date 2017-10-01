@@ -115,8 +115,6 @@ template<typename _T, class Tuple, std::size_t... Is>
 void tuple_2_ptr_(_T* ptr, const Tuple& t, std::index_sequence<Is...>) {
     using sink = int[];
     (void)sink {0, (void(ptr[Is] = std::get<Is>(t), int{}))...};
-
-    //(void)swallow {0, (void(printf("%d, ", std::get<Is>(t)), int{}))...};
 }
 
 template <typename _T, class ...Args>
