@@ -74,7 +74,7 @@ template<typename _T, typename _Alloc>
 const typename Timeseries<_T,_Alloc>::row_t& 
 Timeseries<_T,_Alloc>::operator[](size_t i) const
 {
-    int size = (int)rows_.size();
+    size_t size = (int)rows_.size();
 
     if ((i > 0 && i >= size) || (i < 0 && (i+size) < 0) || size == 0) 
         throw std::out_of_range("out of range");

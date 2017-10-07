@@ -86,7 +86,7 @@ struct Matrix
     size_t rows;
     size_t cols;
     _T** data;
-    Matrix(size_t rows, size_t cols);
+    explicit Matrix(size_t rows, size_t cols);
     ~Matrix();
     const Matrix<_T>& operator=(const Matrix<_T>& rhs) {
     	if (data)
@@ -111,37 +111,41 @@ Matrix<_T>::~Matrix() {
     assert (data == nullptr);
 }
 
-template<typename _T, class Tuple, std::size_t... Is>
-void tuple_2_ptr_(_T* ptr, const Tuple& t, std::index_sequence<Is...>) {
+template<typename _T, class Tuple, std::size_t...Seq>
+void tuple_2_ptr_(_T* ptr, const Tuple& tuple, std::index_sequence<Seq...>) {
     using sink = int[];
-    (void)sink {0, (void(ptr[Is] = std::get<Is>(t), int{}))...};
+    (void)sink {0, (void(ptr[Seq] = std::get<Seq>(tuple)), int{})...};
 }
 
 template <typename _T, class ...Args>
-void tuple_2_ptr(_T* ptr, std::tuple<Args...> t) {
-    tuple_2_ptr_(ptr, t, std::index_sequence_for<Args...>{});
+void tuple_2_ptr(_T* ptr, const std::tuple<Args...>& tuple) {
+    tuple_2_ptr_(ptr, tuple, std::index_sequence_for<Args...>{});
 }
 
-template <typename _T=real_t, typename _K = std::enable_if_t<std::is_arithmetic<_T>::value, _T> >
-Matrix<_T> ts_to_mat(const Timeseries<_T> &ts) {
-    Matrix<_T> mat(ts.size(), ts.column_size());
-    for (size_t i=0; i<ts.size(); ++i)
-    {
-    	const typename Timeseries<_T>::row_t& row = ts[i];
-        mat.data[i][0] = std::get<1>(row);
-    }
-    return mat;
+template <typename _T, typename _U, typename _K = std::enable_if_t<std::is_arithmetic<_T>::value, _T> >
+bool ts_to_mat(const Timeseries<_T>& ts, Matrix<_U>& mat) {
+    if (mat.rows != ts.size()) return false;
+    if (ts.column_size() != 1) return false;
+    if (mat.cols != 1)
+    	return false;
+	for (size_t i=0; i<ts.size(); ++i)
+	{
+		const typename Timeseries<_T>::row_t& row = ts[i];
+		mat.data[i][0] = std::get<1>(row);
+	}
+	return true;
 }
 
-template <typename _T=real_t, typename _K = std::enable_if_t<!std::is_arithmetic<_T>::value, _T> >
-Matrix<_T> ts_to_mat(const Timeseries<_T>& ts, _K* k=0) {
-    Matrix<_T> mat(ts.size(), ts.column_size());
+template <typename _T, typename _U, typename _K = std::enable_if_t<!std::is_arithmetic<_T>::value, _T> >
+bool ts_to_mat(const Timeseries<_T>& ts, Matrix<_U>& mat, _K* k=0) {
+    if (mat.rows != ts.size()) return false;
+    if(mat.cols != ts.column_size()) return false;
     for (size_t i=0; i<ts.size(); ++i)
     {
     	const typename Timeseries<_T>::row_t& row = ts[i];
         tuple_2_ptr(mat.data[i], std::get<1>(row));
     }
-    return mat;
+    return true;
 }
 
 // implement other _T overloads
