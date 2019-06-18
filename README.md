@@ -1,8 +1,6 @@
 
 # PAPRYKA v2.0 - Trading System - Strategy Backtester #
 
-Status: Pre-Alpha
-
 ## FEATURES ##
 
 * Trading system platform
@@ -26,6 +24,6 @@ Status: Pre-Alpha
 
 ## EXAMPLE ##
 
-[`Sample code here`](https://github.com/akalingking/papryka/blob/master/test/strategy/strategybasic.cpp)
+`Sample code`: [`Basic Strategy`](https://github.com/akalingking/papryka/blob/master/test/strategy/strategybasic.cpp)
 
 
