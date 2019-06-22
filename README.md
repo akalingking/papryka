@@ -1,5 +1,5 @@
 
-# PAPRYKA v2.0 - Trading System - Strategy Backtester #
+# PAPRYKA - Trading System & Strategy Backtester
 
 ## FEATURES ##
 
@@ -12,7 +12,7 @@
 * To use just copy header directory and start building trade strategies, see test files for reference.
 
 
-## REQUIREMENTS ##
+## REQUIREMENTS
 
 [1] spdlg       "https://github.com/gabime/spdlog"
 
@@ -22,7 +22,7 @@
 
 [4] gcovr       "http://gcovr.com/"
 
-## EXAMPLE ##
+## EXAMPLE
 
 `Sample code`: [`Basic Strategy`](https://github.com/akalingking/papryka/blob/master/test/strategy/strategybasic.cpp)
 
