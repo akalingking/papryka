@@ -13,7 +13,7 @@
 
 
 ## REQUIREMENTS
-
+```ascii
 [1] spdlg       "https://github.com/gabime/spdlog"
 
 [2] quantlib    libquantlib0-dev or from [`quantlib source`](https://quantlib.org/download.shtml)
@@ -23,7 +23,7 @@
 [4] gcovr       "http://gcovr.com/"
 
 [5] curl        libcurl4-gnutls-dev
-
+```ascii
 ## EXAMPLE
 
 `Sample code`: [`Basic Strategy`](https://github.com/akalingking/papryka/blob/master/test/strategy/strategybasic.cpp)
