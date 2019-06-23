@@ -10,10 +10,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        position.cpp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        August 7, 2016 2:10 AM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com> 
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 

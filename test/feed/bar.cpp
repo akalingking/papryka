@@ -10,17 +10,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        bartimeseries.cpp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 2, 2016 5:46 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #include <gtest/gtest.h>
 #include <papryka/detail/date.h>
 #include <papryka/feed/frequency.h>
 #include <papryka/feed/bar.h>
- 
+
 using namespace papryka;
 
 TEST(Bar, basicConstruction)

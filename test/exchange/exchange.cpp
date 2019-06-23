@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        exchange.cpp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 23, 2016 11:42 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #include <gtest/gtest.h>
 #include <papryka/papryka.h>
@@ -26,23 +25,23 @@ using namespace papryka;
 TEST(Exchange, Exchange)
 {
     typedef FeedSynthetic<Bar> feed_t;
-    
+
     datetime_t end = Clock::now();
     datetime_t start = end - std::chrono::days(100);
-    
+
     std::shared_ptr<feed_t> feed(new feed_t(start, end, Frequency::Day));
-    
+
     Bar goog_spot(771,773,770,772,1350000);
     Bar msft_spot(59,61,58,60,15000000);
     feed_t::data_t data = {
         // symbol, spot, volatility, exp return
-        {"GOOG", goog_spot, 0.2, 0.1}, 
+        {"GOOG", goog_spot, 0.2, 0.1},
         {"MSFT", msft_spot, 0.2, 0.1}};
-    
+
     feed->add_values_from_generator(data);
 
     Exchange<Bar> exchange(feed, 1000);
-    
+
     Dispatcher dispatcher;
     dispatcher.add_subject(feed);
     dispatcher.run();
