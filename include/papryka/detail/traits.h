@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        traits.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 23, 2016 8:15 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include "types.h"
@@ -33,7 +32,7 @@ namespace papryka {
  * @param _Alloc    memory allocator
  */
 template <typename _T=real_t, typename _Alloc=std::allocator<_T>>
-struct Traits 
+struct Traits
 {
     typedef _T value_t;
     typedef std::map<std::string, value_t> values_t;

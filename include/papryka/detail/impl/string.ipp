@@ -10,27 +10,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        string.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        August 29, 2016 8:41 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
-std::string &ltrim(std::string &s) 
+std::string &ltrim(std::string &s)
 {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
     return s;
 }
 
 // trim from end
-std::string &rtrim(std::string &s) 
+std::string &rtrim(std::string &s)
 {
         s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
         return s;
 }
 
 // trim from both ends
-std::string &trim(std::string &s) 
+std::string &trim(std::string &s)
 {
         return ltrim(rtrim(s));
 }
@@ -43,7 +42,7 @@ void tokenize(const std::string& str, std::vector<std::string>& tokens, const st
     // Find first non-delimiter.
     std::string::size_type pos = str.find_first_of(delimiters, lastPos);
 
-    while (std::string::npos != pos || std::string::npos != lastPos) 
+    while (std::string::npos != pos || std::string::npos != lastPos)
     {
         // Found a token, add it to the vector.
         tokens.push_back(str.substr(lastPos, pos - lastPos));

@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        precision.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 23, 2016 12:34 AM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include <cmath>
@@ -38,8 +37,8 @@ namespace papryka {
         }
         return ret;
     }
-    
-    
+
+
     struct precision {
         static const constexpr int s_precision = 6;
         template<typename _T> static _T round(_T value, size_t precision=s_precision) { return round_(value, precision); }

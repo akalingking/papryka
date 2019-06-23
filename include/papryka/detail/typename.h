@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        typename.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        August 21, 2016 7:16 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com> 
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include <string>
@@ -23,9 +22,9 @@
 
 namespace papryka {
 /**
- * @brief extracts type name at runtime, 
+ * @brief extracts type name at runtime,
  * make sure we *DO NOT USE** in production|release mode, memory usage will slow us down.
- * @return 
+ * @return
  */
 #ifdef _DEBUG
 template<typename T>
@@ -34,15 +33,15 @@ std::string type_name()
     int status;
     std::string tname = typeid(T).name();
     char *demangled_name = abi::__cxa_demangle(tname.c_str(), nullptr, nullptr, &status);
-    if(status == 0) 
+    if(status == 0)
     {
         tname = demangled_name;
         std::free(demangled_name);
-    }   
+    }
     return tname;
 }
 #else
-template<typename T> std::string type_name() { return ""; }    
+template<typename T> std::string type_name() { return ""; }
 #endif
 
 }

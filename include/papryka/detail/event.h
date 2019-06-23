@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        event.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 2, 2016 10:38 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include "logger.h"
@@ -37,7 +36,7 @@ namespace detail {
 
 namespace std {
     template<int N>
-    struct is_placeholder<papryka::detail::placeholder<N> > 
+    struct is_placeholder<papryka::detail::placeholder<N> >
             : integral_constant<int, N + 1 > {};
 }
 
@@ -60,7 +59,7 @@ namespace detail {
         Action_() : id_(++static_id_t::value) {}
         virtual ~Action_() {}
         uint32_t id_;
-    }; 
+    };
 }
 
 template <typename...Args>
@@ -122,13 +121,13 @@ private:
 #endif
 public:
     Event() : is_emitting_(false)  { log_trace("Event::{}", __func__); }
-    
+
     ~Event() { log_trace("Event::{}", __func__); }
     /**
-     * 
+     *
      * @param
      * @param
-     * @return 
+     * @return
      */
     template<typename T, typename...Args>
     uint32_t subscribe(void(T::*fp)(Args...), T* t)
@@ -159,7 +158,7 @@ public:
 
         if ((*iter)->id_ == id)
         {
-            
+
 #ifndef STL_ATOMIC
         if (!is_emitting_)
 #else
@@ -189,7 +188,7 @@ public:
         is_emitting_ = false;
 #else
         is_emitting_.store(false);
-#endif     
+#endif
         apply_changes_();
     }
 

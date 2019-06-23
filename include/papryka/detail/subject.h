@@ -10,16 +10,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        subject.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 9, 2016 1:27 AM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 namespace papryka {
 
-struct Subject 
+struct Subject
 {
     virtual void start() = 0;
     virtual void stop() = 0;
@@ -30,5 +29,5 @@ struct Subject
 protected:
     Subject() = default;
 };
-    
+
 }
