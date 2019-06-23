@@ -1,7 +1,5 @@
 
 /**
- * Copyright 2015 Ariel Kalingking <akalingking@gmail.com>
- * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,25 +11,29 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @file        strategy.h
+ * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 template <typename _D, typename _T>
 Strategy<_D,_T>::Strategy(exchange_ptr_t exchange) : feed(exchange->feed), exchange(exchange)
 {
 //    symbols_ = feed->get_symbols();
-    
+
     exchange->order_event.subscribe(&Strategy<_D,_T>::on_order_event_, this);
-    
+
     // Strategy must subscribe to bar events after the exchange.
     feed->new_values_event.subscribe(&Strategy<_D,_T>::on_bars_, this);
-    
+
     dispatcher_.start_event.subscribe(&Strategy<_D,_T>::on_start_, this);
-    
+
     dispatcher_.idle_event.subscribe(&Strategy<_D,_T>::on_idle_, this);
-    
+
     dispatcher_.stop_event.subscribe(&Strategy<_D,_T>::on_stop_, this);
-    
+
     dispatcher_.add_subject(feed);
-    
+
     log_trace("Strategy<{}>::{}", type_name<_D>(), __func__);
 }
 
@@ -43,13 +45,13 @@ Strategy<_D,_T>::~Strategy()
 }
 
 template <typename _D, typename _T>
-void Strategy<_D,_T>::run() 
-{ 
+void Strategy<_D,_T>::run()
+{
     log_debug("Strategy::{} entry", __func__);
     dispatcher_.start();
     dispatcher_.wait();
     log_debug("Strategy::{} exit", __func__);
-    
+
 }
 
 template <typename _D, typename _T>
@@ -59,7 +61,7 @@ void Strategy<_D,_T>::on_bars_(const datetime_t& date, const values_t& values)
     analyzers_.before_on_bars(*this, values);
 #endif
     (static_cast<_D&>(*this)).on_bars(date, values);
-    
+
     bars_processed_event.emit(*this, values);
 }
 
@@ -70,28 +72,28 @@ void Strategy<_D,_T>::on_order_event_(exchange_t& exchange, order_event_ptr_t or
     order_t* order = (order_t*)orderEvent->order;
     assert (order != nullptr);
     const uint32_t& order_id = order->id;
-   
-    log_trace("Strategy::{} {} order id={} order type={} action={} order event type={} order state={}", 
-            __func__, to_str(orderEvent->datetime), order_id, order_t::to_str(order->type), order_t::to_str(order->action), 
+
+    log_trace("Strategy::{} {} order id={} order type={} action={} order event type={} order state={}",
+            __func__, to_str(orderEvent->datetime), order_id, order_t::to_str(order->type), order_t::to_str(order->action),
             order_t::Event::to_str(orderEvent->type), order_t::to_str(order->state));
-    
+
     (static_cast<_D&>(*this)).on_order_updated(order);
-    
+
     order_to_position_t::iterator order_to_pos_iter = order_to_position_.find(order_id);
     if (order_to_pos_iter != order_to_position_.end())
     {
         const uint32_t& pos_id = order_to_pos_iter->second;
         assert (pos_id != 0);
-        typename positions_t::iterator pos_iter = active_positions_.find(pos_id);       
+        typename positions_t::iterator pos_iter = active_positions_.find(pos_id);
         if (pos_iter != active_positions_.end())
         {
-            position_t* pos = pos_iter->second.get();            
+            position_t* pos = pos_iter->second.get();
             assert (pos != nullptr);
             if (pos != nullptr)
             {
                 // emit event first, before possibly getting destroyed
                 pos->on_order_event(orderEvent);
-                
+
                 if (!order->is_active())
                 {
                     log_debug("Strategy::{} unlink order id={} from position id={}", __func__, order_id, pos_id);
@@ -170,18 +172,18 @@ real_t Strategy<_D,_T>::get_last_price(const std::string& symbol) const
 }
 
 template <typename _D, typename _T>
-const datetime_t& Strategy<_D,_T>::get_current_datetime() const 
-{ 
+const datetime_t& Strategy<_D,_T>::get_current_datetime() const
+{
     return feed->current_date;
 }
 
 template <typename _D, typename _T>
-typename Strategy<_D,_T>::order_ptr_t Strategy<_D,_T>::create_order(typename order_t::Type type, typename order_t::Action action, const std::string& symbol, size_t quantity, 
+typename Strategy<_D,_T>::order_ptr_t Strategy<_D,_T>::create_order(typename order_t::Type type, typename order_t::Action action, const std::string& symbol, size_t quantity,
         bool isFillOnClose, real_t stopPrice, real_t limitPrice)
 {
-    return exchange->create_order(type, action, symbol, quantity, isFillOnClose, stopPrice, limitPrice);            
+    return exchange->create_order(type, action, symbol, quantity, isFillOnClose, stopPrice, limitPrice);
 }
-    
+
 template <typename _D, typename _T>
 typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_long(const std::string& symbol, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone)
 {
@@ -231,7 +233,7 @@ typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_short_limit(cons
 }
 
 template <typename _D, typename _T>
-typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_long_stop_limit(const std::string& symbol, size_t quantity, 
+typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_long_stop_limit(const std::string& symbol, size_t quantity,
         real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
     position_ptr_t ptr(new LongPosition<_D,_T>(*this, symbol, stopPrice, limitPrice, quantity, isGoodTillCanceled, isAllOrNone));
@@ -240,7 +242,7 @@ typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_long_stop_limit(
 }
 
 template <typename _D, typename _T>
-typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_short_stop_limit(const std::string& symbol, size_t quantity, 
+typename Strategy<_D,_T>::position_ptr_t Strategy<_D,_T>::enter_short_stop_limit(const std::string& symbol, size_t quantity,
         real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled, bool isAllOrNone)
 {
     position_ptr_t ptr(new ShortPosition<_D,_T>(*this, symbol, stopPrice, limitPrice, quantity, isGoodTillCanceled, isAllOrNone));

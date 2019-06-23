@@ -1,4 +1,4 @@
-include ../makefile.ubuntu
+include ../makefile.mk
 LIBS += -lQuantLib
 INCLUDES += -I../include
 
