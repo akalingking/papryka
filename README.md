@@ -16,7 +16,7 @@
 
 [1] spdlg       "https://github.com/gabime/spdlog"
 
-[2] quantlib    libquantlib0-dev or from [`quantlib source`]("https://quantlib.org/download.shtml")
+[2] quantlib    libquantlib0-dev or from [`quantlib source`](https://quantlib.org/download.shtml)
 
 [3] googletest	"https://github.com/google/googletest"
 
