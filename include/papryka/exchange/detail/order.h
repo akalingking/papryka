@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        detail/order.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 23, 2016 1:40 AM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include "../../detail/types.h"
@@ -28,9 +27,9 @@
 namespace papryka {
 namespace detail {
     //@{ order table names
-    template<typename _T> 
-    struct order_names_ 
-    { 
+    template<typename _T>
+    struct order_names_
+    {
         static const char* types[];
         static const char* actions[];
         static const char* states[];
@@ -44,7 +43,7 @@ namespace detail {
     template<typename _T> const char* order_names_<_T>::events[] =  { "EventNone", "Submitted", "Accepted", "Canceled", "PartiallyFilled", "Filled" };
     typedef order_names_<void> order_names_t;
     //@} order table names
-    
+
     /**
      * @brief   Order state machine
      */
@@ -53,13 +52,13 @@ namespace detail {
     public:
         struct Info;
         struct Event;
-        
+
         typedef Bar bar_t;
         typedef Event event_t;
         typedef Info info_t;
         typedef std::shared_ptr<event_t> event_ptr_t;
         typedef std::shared_ptr<info_t> info_ptr_t;
-        
+
         enum Type { TypeNone=0, Market=1, Limit=2, Stop=3, StopLimit=4 };
         enum Action { ActionNone=0, Buy=1, BuyToCover=2, Sell=3, SellShort=4 };
         enum State { StateNone=0, Initial=1, Submitted=2, Accepted=3, Canceled=4, PartiallyFilled=5, Filled=6 };
@@ -82,12 +81,12 @@ namespace detail {
         uint32_t id;
         real_t filled;
         real_t avg_fill_price;
-        
+
         inline ~Order();
         inline void set_submitted(uint32_t id, const datetime_t& datetime);
         inline void switch_state(State newState);
         inline void add_info(info_ptr_t& info);
-        
+
         size_t get_remaining() const { return quantity - filled;  }
         bool is_buy() const { return action == Buy || action == BuyToCover; }
         bool is_sell() const { return action == Sell || action == SellShort; }
@@ -101,13 +100,13 @@ namespace detail {
 
     protected:
         inline Order(Type type, Action action, const std::string& symbol, size_t quantity);
-        
+
     private:
         // state transition table
         inline size_t get_valid_states(State state, std::set<State>& next_states) const;
-        inline bool is_valid_state_(State current, State newState) const;        
+        inline bool is_valid_state_(State current, State newState) const;
         static const constexpr int s_max_transition_state = 5;
-        struct StateTable 
+        struct StateTable
         {
             State current;
             State valid_states[s_max_transition_state];
@@ -118,7 +117,7 @@ namespace detail {
         // order names instance
         order_names_t order_names_;
     };
-    
+
     struct Order::Info
     {
         typedef std::shared_ptr<Info> ptr_t;
@@ -137,7 +136,7 @@ namespace detail {
         Info() : error(ErrorNone), price(0), quantity(0), commission(0) { log_trace("order::info::{}", __func__); }
         Info(Error error) : error(error), price(0), quantity(0), commission(0) { log_trace("order::info::{}", __func__); }
     };
-    
+
     struct Order::Event
     {
         typedef std::shared_ptr<Event> ptr_t;
@@ -153,7 +152,7 @@ namespace detail {
         { log_trace("Order::Event::{} type={}", __func__, to_str(type)); }
         ~Event() { log_trace("Order::Event::{} type={}", __func__, to_str(type)); }
     };
-    
+
     // traits
     struct market_order_tag {};
     struct limit_order_tag {};
@@ -164,7 +163,7 @@ namespace detail {
     template<> struct order_traits<Order::Limit> { typedef limit_order_tag type; };
     template<> struct order_traits<Order::Stop> { typedef stop_order_tag type; };
     template<> struct order_traits<Order::StopLimit> { typedef stop_limit_order_tag type; };
-        
+
 #include "impl/order.ipp"
 }}
 

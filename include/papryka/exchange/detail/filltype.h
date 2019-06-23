@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        fillstrategy.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 23, 2016 6:12 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include "../../detail/traits.h"
@@ -32,14 +31,14 @@
 namespace papryka {
 namespace detail {
 
-struct FillTrigger 
+struct FillTrigger
 {
     typedef Traits<Bar>::value_t value_t;
     inline real_t get_stop_price_trigger(Order::Action action, real_t stopPrice, bool useAdjValues, const value_t& value);
     inline real_t get_limit_price_trigger(Order::Action action, real_t limitPrice, bool useAdjValues, const value_t& value);
 };
 
-struct FillInfo 
+struct FillInfo
 {
     FillInfo(real_t price, size_t quantity) : price(price), quantity(quantity) {}
     real_t price;
@@ -49,7 +48,7 @@ struct FillInfo
 /**
  * @brief Used by Order types to fill order executions.
  * Order type is a function template argument since this object is a
- * template parameter to Order types.  
+ * template parameter to Order types.
  * @param _T is the bar type
  */
 template <typename _T>
@@ -89,12 +88,12 @@ public:
     template <typename _Order>
     info_ptr_t fill(_Order& order, const value_t& bar, stop_limit_order_tag&&);
 
-private:    
+private:
     slippage_t slippage_;
     real_t volume_limit_;
     volumes_t volume_left_;
     volumes_t volume_used_;
-    
+
     template <typename _Order>
     real_t calculate_fill_size_(_Order& order, const value_t& bar);
 };

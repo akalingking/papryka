@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        exchange.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 23, 2016 5:55 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include "../../detail/types.h"
@@ -30,8 +29,8 @@
 namespace papryka {
 namespace detail {
 
-template <typename _T,  
-        typename _Fill=FillType<_T>, 
+template <typename _T,
+        typename _Fill=FillType<_T>,
         typename _Commission=NoCommission>
 class Exchange
 {
@@ -58,7 +57,7 @@ public:
     bool allow_negative_cash;
     real_t cash;
     Precision precision_;
-    
+
 protected:
     orders_t orders_;
     Exchange(feed_ptr_t feed, real_t cash);
@@ -73,6 +72,6 @@ private:
     void post_process_order(const datetime_t& datetime, const value_t& value, order_t* order);
     bool commit_order_execution(const datetime_t& datetime, order_t* order, fill_info_t* fill);
 };
-    
+
 #include "./impl/exchange.ipp"
 }}

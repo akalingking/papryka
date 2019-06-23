@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        order.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 23, 2016 11:58 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 template <typename _T> Order::StateTable Order::state_table<_T>::value[] = {
     { Order::Initial, { Order::Submitted, Order::Canceled, Order::StateNone}},
@@ -76,7 +75,7 @@ void Order::switch_state(State newState)
 void Order::set_submitted(uint32_t id, const datetime_t& datetime)
 {
     log_trace("Order::{} id current={}, new={} submiited_date={} (entry)", __func__, this->id, id, papryka::to_str(submitted_date));
-    
+
     if (this->id == 0)
     {
         this->id = id;
@@ -87,14 +86,14 @@ void Order::set_submitted(uint32_t id, const datetime_t& datetime)
     {
         assert(false);
     }
-    
+
     log_trace("Order::{} (exit)", __func__);
 }
 
 void Order::add_info(info_ptr_t& info)
 {
     log_trace("Order::{} id={} datetime={} (entry)", __func__, id, papryka::to_str(info->datetime));
-    
+
     if (info->quantity > get_remaining())
     {
         std::stringstream strm;

@@ -1,4 +1,20 @@
-
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @file        order.h
+ * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
+ */
 template <typename _T, typename _Fill, typename _Commission>
 Exchange<_T, _Fill, _Commission>::Exchange(feed_ptr_t feed, real_t cash) :
     feed(feed), cash(cash), fillstrategy(feed->frequency)
@@ -21,7 +37,7 @@ void Exchange<_T, _Fill, _Commission>::unregister_order(uint32_t id)
 template <typename _T, typename _Fill, typename _Commission>
 void Exchange<_T, _Fill, _Commission>::on_bars(const datetime_t& datetime, const values_t& values)
 {
-    log_trace("Exchange:{} {}", __func__, to_str(datetime));    
+    log_trace("Exchange:{} {}", __func__, to_str(datetime));
 	fillstrategy.on_bars(datetime, values);
     typename orders_t::iterator iter = orders_.begin();
     for (; iter != orders_.end(); ++iter)
@@ -68,7 +84,7 @@ void Exchange<_T, _Fill, _Commission>::on_bars_imp(const datetime_t& datetime, c
 template <typename _T, typename _Fill, typename _Commission>
 void Exchange<_T, _Fill, _Commission>::process_order(const datetime_t& datetime, const value_t& value, order_t* order)
 {
-    log_debug("Exchange::{} order id={} qty={} current date={} type={} action={}", 
+    log_debug("Exchange::{} order id={} qty={} current date={} type={} action={}",
             __func__, order->id, order->quantity, to_str(datetime), order_t::to_str(order->type), order_t::to_str(order->action));
 
     if (!pre_process_order(datetime, value, order))
@@ -90,7 +106,7 @@ void Exchange<_T, _Fill, _Commission>::process_order(const datetime_t& datetime,
 template <typename _T, typename _Fill, typename _Commission>
 bool Exchange<_T, _Fill, _Commission>::pre_process_order(const datetime_t& datetime, const value_t& value, order_t* order)
 {
-    log_trace("Exchange::{} order id={} state={} current date={} accepted date={}", 
+    log_trace("Exchange::{} order id={} state={} current date={} accepted date={}",
             __func__, order->id, order_t::to_str(order->state), to_str(datetime), to_str(order->accepted_date));
 
     bool ret = true;
@@ -105,13 +121,13 @@ bool Exchange<_T, _Fill, _Commission>::pre_process_order(const datetime_t& datet
         if (expired)
         {
             log_warn("Exchange::{} order id={} has expired, bar date={} accepted date={}", __func__, order->id, to_str(datetime), to_str(order->accepted_date));
-            
+
             order->switch_state(order_t::Canceled);
             event_ptr_t event(new typename order_t::Event(datetime, order, order_t::Event::Canceled, info_ptr_t(nullptr)));
             order_event.emit(*this, event);
-            
+
             unregister_order(order->id);
-            
+
             ret = false;
         }
     }
@@ -122,7 +138,7 @@ bool Exchange<_T, _Fill, _Commission>::pre_process_order(const datetime_t& datet
 template <typename _T, typename _Fill, typename _Commission>
 void Exchange<_T, _Fill, _Commission>::post_process_order(const datetime_t& datetime, const value_t& value, order_t* order)
 {
-    log_debug("Exchange::{} order id={} current date={} accepted date={}", 
+    log_debug("Exchange::{} order id={} current date={} accepted date={}",
             __func__, order->id, to_str(datetime), to_str(order->accepted_date));
 
     if (!order->is_good_till_canceled)
@@ -132,12 +148,12 @@ void Exchange<_T, _Fill, _Commission>::post_process_order(const datetime_t& date
         if (expired)
         {
             log_error("Exchange::{} order id={} has expired", __func__, order->id);
-            
+
             // emit event first before destroying order instance in unregister_order
             order->switch_state(order_t::Canceled);
             event_ptr_t event(new typename order_t::Event(datetime, order, order_t::Event::Canceled, info_ptr_t(nullptr)));
             order_event.emit(*this, event);
-            
+
             unregister_order(order->id);
         }
     }
@@ -146,8 +162,8 @@ void Exchange<_T, _Fill, _Commission>::post_process_order(const datetime_t& date
 template <typename _T, typename _Fill, typename _Commission>
 bool Exchange<_T, _Fill, _Commission>::commit_order_execution(const datetime_t& datetime, order_t* order, fill_info_t* fill)
 {
-    log_trace("Exchange::{} date={} id={} order type={} action={} qty={}, filled={}, new fill={} at price={}", __func__, 
-            papryka::to_str(datetime), order->id, order_t::to_str(order->type), order_t::to_str(order->action), 
+    log_trace("Exchange::{} date={} id={} order type={} action={} qty={}, filled={}, new fill={} at price={}", __func__,
+            papryka::to_str(datetime), order->id, order_t::to_str(order->type), order_t::to_str(order->action),
             order->quantity, order->filled, fill->quantity, fill->price);
 
     bool ret = false;
