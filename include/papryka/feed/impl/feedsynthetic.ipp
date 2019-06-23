@@ -10,12 +10,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        bartimeseries.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 2, 2016 8:41 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
- */ 
+ * @copyright   (c) <www.sequenceresearch.com>
+ */
 //@{ Basic Random Generator
 Generator_::Generator_(const datetime_t& start, const datetime_t& end, Frequency frequency) :
         GeneratorBase(start, end, frequency), dist(0.1, 1.0)
@@ -29,15 +28,15 @@ BasicGenerator<real_t>::BasicGenerator(const datetime_t& start, const datetime_t
     log_trace("BasicGenerator created");
 }
 
-size_t BasicGenerator<real_t>::generate(rows_t& rows) 
+size_t BasicGenerator<real_t>::generate(rows_t& rows)
 {
     log_trace("BasicGenerator::generate entry");
     datetime_t date = start;
     ql::Calendar cal = ql::UnitedStates();
     size_t counter = 0;
-    while (date <= end && counter++ < maxlen) 
+    while (date <= end && counter++ < maxlen)
     {
-        if (cal.isBusinessDay(to_qdate(date))) 
+        if (cal.isBusinessDay(to_qdate(date)))
         {
             real_t value = (real_t)dist(rng);
             row_t row = row_t(date, value);
@@ -50,18 +49,18 @@ size_t BasicGenerator<real_t>::generate(rows_t& rows)
 }
 
 BasicGenerator<Bar>::BasicGenerator(const datetime_t& start, const datetime_t& end, Frequency frequency) :
-        Generator_(start, end, frequency) 
+        Generator_(start, end, frequency)
 { log_trace("BasicGenerator created"); }
 
-size_t BasicGenerator<Bar>::generate(rows_t& rows) 
+size_t BasicGenerator<Bar>::generate(rows_t& rows)
 {
     log_trace("BasicGenerator::generate entry");
     datetime_t date = start;
     ql::Calendar cal = ql::UnitedStates();
     size_t counter = 0;
-    while (date <= end && counter++ < maxlen) 
+    while (date <= end && counter++ < maxlen)
     {
-        if (cal.isBusinessDay(to_qdate(date))) 
+        if (cal.isBusinessDay(to_qdate(date)))
         {
             std::vector<real_t> vals;
             vals.push_back(real_t(dist(rng)));
@@ -90,20 +89,20 @@ size_t BasicGenerator<Bar>::generate(rows_t& rows)
 //@{ Geometric Brownian Motion Generator
 template <typename _T>
 GbmGenerator<_T>::GbmGenerator(const datetime_t& start, const datetime_t& end, const value_t& startPrice, real_t volatilityPct, real_t meanReturnPct, Frequency frequency) :
-        GeneratorBase(start, end, frequency), impl(startPrice, volatilityPct, meanReturnPct, 0.0, get_bars_per_day(frequency)) 
-{   
+        GeneratorBase(start, end, frequency), impl(startPrice, volatilityPct, meanReturnPct, 0.0, get_bars_per_day(frequency))
+{
 }
 
 template <typename _T>
-size_t GbmGenerator<_T>::generate(rows_t& rows) 
+size_t GbmGenerator<_T>::generate(rows_t& rows)
 {
     log_trace("GbmGenerator::generate entry");
     datetime_t date = start;
     ql::Calendar cal = ql::UnitedStates();
     size_t counter = 0;
-    while (date <= end && counter++ < maxlen) 
+    while (date <= end && counter++ < maxlen)
     {
-        if (cal.isBusinessDay(to_qdate(date))) 
+        if (cal.isBusinessDay(to_qdate(date)))
         {
             value_t value = impl.generate();
             log_trace("GbmGenerator<{}>::{} {} value:{}", type_name<_T>(), __func__,to_str(date), value);
@@ -125,17 +124,17 @@ GbmGenerator<Bar>::GbmGenerator(const datetime_t& start, const datetime_t& end, 
         volume(startPrice.volume, volatilityPct, meanReturnPct, 0.0, get_bars_per_day(frequency))
 {
 }
-    
-size_t GbmGenerator<Bar>::generate(rows_t& rows) 
+
+size_t GbmGenerator<Bar>::generate(rows_t& rows)
 {
     log_trace("GbmGenerator::generate entry");
     datetime_t date = start;
     ql::Calendar cal = ql::UnitedStates();
     size_t counter = 0;
     value_t value;
-    while (date <= end && counter++ < maxlen) 
+    while (date <= end && counter++ < maxlen)
     {
-        if (cal.isBusinessDay(to_qdate(date))) 
+        if (cal.isBusinessDay(to_qdate(date)))
         {
             // fill open, close and volume
             value.open = open.generate();
@@ -147,15 +146,15 @@ size_t GbmGenerator<Bar>::generate(rows_t& rows)
             values.push_back(value.close);
             values.push_back(low.generate());
             values.push_back(high.generate());
-            
+
             std::sort(values.begin(), values.end());
             value.low = values.front();
             value.high = values.back();
-            log_trace("GbmGenerator<Bar>::{0:} {1:} o:{2:0.3f} h:{3:0.3f} l:{4:0.3f} c:{5:0.3f} v:{6:}", 
+            log_trace("GbmGenerator<Bar>::{0:} {1:} o:{2:0.3f} h:{3:0.3f} l:{4:0.3f} c:{5:0.3f} v:{6:}",
                     __func__,to_str(date), value.open,value.high,value.low,value.close,value.volume);
             row_t row = row_t(date, value);
             rows.push_back(row);
-        }        
+        }
         date = get_next_timepoint(date, frequency);
     }
     log_trace("GbmGenerator::generate exit");
@@ -192,6 +191,6 @@ void FeedSynthetic<_T, _Generator>::add_values_from_generator(const data_t& data
         assert (!rows.empty());
         base_t::add_values(data.symbol, rows);
     }
-    
+
     log_trace("FeedSynthetic::add_values_from_generator exit");
 }

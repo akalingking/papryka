@@ -10,16 +10,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        timeseries.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 2, 2016 10:42 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
- 
+
 template<typename _T, typename _Alloc>
-Timeseries<_T,_Alloc>::Timeseries(Frequency frequency, size_t maxlen, Event* eventSource) : 
-    frequency(frequency), maxlen(maxlen) 
+Timeseries<_T,_Alloc>::Timeseries(Frequency frequency, size_t maxlen, Event* eventSource) :
+    frequency(frequency), maxlen(maxlen)
 {
     if (eventSource)
         eventSource->subscribe(&Timeseries::on_new_value_, this);
@@ -27,17 +26,17 @@ Timeseries<_T,_Alloc>::Timeseries(Frequency frequency, size_t maxlen, Event* eve
 }
 
 template<typename _T, typename _Alloc>
-Timeseries<_T,_Alloc>::~Timeseries() 
+Timeseries<_T,_Alloc>::~Timeseries()
 {
     log_trace("Timeseries<_T>::{} size={}", __func__, rows_.size());
 }
 
 template<typename _T, typename _Alloc>
-void Timeseries<_T,_Alloc>::push_back(const row_t& row) 
+void Timeseries<_T,_Alloc>::push_back(const row_t& row)
 {
-    if (rows_.size() < maxlen) 
+    if (rows_.size() < maxlen)
     {
-        if (!rows_.empty() && std::get<0>(row) != nulldate) 
+        if (!rows_.empty() && std::get<0>(row) != nulldate)
         {
             const row_t& last = rows_.back();
             if (std::get<0>(last) < std::get<0>(last))
@@ -46,8 +45,8 @@ void Timeseries<_T,_Alloc>::push_back(const row_t& row)
 
         rows_.push_back(row);
         event_new_value.emit(row);
-    } 
-    else 
+    }
+    else
     {
         std::string error("max size error, ");
         error += std::to_string(rows_.size());
@@ -71,24 +70,24 @@ typename Timeseries<_T,_Alloc>::row_t Timeseries<_T,_Alloc>::pop_front()
 }
 
 template<typename _T, typename _Alloc>
-const typename Timeseries<_T,_Alloc>::row_t& 
+const typename Timeseries<_T,_Alloc>::row_t&
 Timeseries<_T,_Alloc>::operator[](size_t i) const
 {
     size_t size = (int)rows_.size();
 
-    if ((i > 0 && i >= size) || (i < 0 && (i+size) < 0) || size == 0) 
+    if ((i > 0 && i >= size) || (i < 0 && (i+size) < 0) || size == 0)
         throw std::out_of_range("out of range");
 
     return (i < 0) ? rows_[i+size] : rows_[i];
 }
 
 template<typename _T, typename _Alloc>
-typename Timeseries<_T,_Alloc>::row_t& 
+typename Timeseries<_T,_Alloc>::row_t&
 Timeseries<_T,_Alloc>::operator[](size_t i)
 {
     size_t size = (int)rows_.size();
 
-    if ((i > 0 && i >= size) || (i < 0 && (i+size) < 0) || size == 0) 
+    if ((i > 0 && i >= size) || (i < 0 && (i+size) < 0) || size == 0)
         throw std::out_of_range("out of range");
 
     return (i < 0) ? rows_[i+size] : rows_[i];
@@ -119,7 +118,7 @@ bool Timeseries<_T,_Alloc>::empty() const
 }
 
 template<typename _T, typename _Alloc>
-typename Timeseries<_T,_Alloc>::iterator_t& 
+typename Timeseries<_T,_Alloc>::iterator_t&
 Timeseries<_T,_Alloc>::begin()
 {
     rows_.begin();
@@ -133,14 +132,14 @@ Timeseries<_T,_Alloc>::begin() const
 }
 
 template<typename _T, typename _Alloc>
-typename Timeseries<_T,_Alloc>::iterator_t& 
+typename Timeseries<_T,_Alloc>::iterator_t&
 Timeseries<_T,_Alloc>::end()
 {
     rows_.end();
 }
 
 template<typename _T, typename _Alloc>
-typename Timeseries<_T,_Alloc>::const_iterator_t& 
+typename Timeseries<_T,_Alloc>::const_iterator_t&
 Timeseries<_T,_Alloc>::end() const
 {
     rows_.end();

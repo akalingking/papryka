@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        order.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 23, 2016 11:58 PM
- * @copyright   2017 www.sequenceresearch.com
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include "../detail/types.h"
@@ -45,13 +44,13 @@ public:
     using base_t::Action;
     using base_t::Info;
     using base_t::Event;
-            
+
     bool is_fill_on_close;
     bool is_limit_hit;
     bool is_stop_hit;
     real_t stop_price;
     real_t limit_price;
-    
+
     Order(base_t::Type type, base_t::Action action, const std::string& symbol, size_t quantity, bool isFillOnClose=false, real_t stopPrice=real_t(0.0), real_t limitPrice=real_t(0.0));
     ~Order();
     fill_info_ptr_t process(fill_t& fill, const value_t& value);
