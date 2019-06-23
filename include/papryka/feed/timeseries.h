@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        timeseries.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 2, 2016 10:42 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include "../detail/types.h"
@@ -72,7 +71,7 @@ private:
     void on_new_value_(const row_t& row);
     rows_t rows_;
 };
-    
+
 #include "impl/timeseries.ipp"
 }
 

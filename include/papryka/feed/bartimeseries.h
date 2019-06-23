@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        bartimeseries.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 5, 2016 8:41 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include <papryka/detail/date.h>
@@ -47,6 +46,6 @@ public:
     void push_back(const row_t& row);
 };
 
-#include "impl/bartimeseries.ipp" 
+#include "impl/bartimeseries.ipp"
 }
 

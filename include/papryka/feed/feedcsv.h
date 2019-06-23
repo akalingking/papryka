@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        csvfeed.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        August 25, 2016 5:56 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com> 
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include "feed.h"
@@ -29,7 +28,7 @@
 
 namespace papryka {
 
-template<typename _T=real_t> 
+template<typename _T=real_t>
 class FeedCsv: public FeedMemFilter<_T>
 {
 public:
@@ -45,7 +44,7 @@ public:
 };
 
 template<>
-class FeedCsv<Bar> : public FeedMemFilter<Bar> 
+class FeedCsv<Bar> : public FeedMemFilter<Bar>
 {
 public:
     typedef Bar value_t;
@@ -55,10 +54,10 @@ public:
     std::string date_column;
     std::string date_format;
     const char delimiter;
-    
-    inline FeedCsv(const std::string& dateColumn="Date", const std::string& dateFormat=s_datetime_format, const char delimiter=',', 
+
+    inline FeedCsv(const std::string& dateColumn="Date", const std::string& dateFormat=s_datetime_format, const char delimiter=',',
             Frequency frequency=Frequency::Day, size_t maxLen=s_timeseries_max_len);
-    
+
     inline void add_values_from_csv(const std::string& symbol, const std::string& filename);
 };
 

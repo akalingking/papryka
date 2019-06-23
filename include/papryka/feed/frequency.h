@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        frequency.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 23, 2016 7:57 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include  "../detail/date.h"
@@ -51,9 +50,9 @@ static datetime_t get_next_timepoint(const datetime_t& datetime, Frequency frequ
 
 // will not work unless _Rep and _Duration is supplied in call (e.g. get_duration<type, type>(frequency))
 template <typename _Rep, typename _Duration>
-static auto get_duration(Frequency frequency)->decltype(std::chrono::duration<_Rep, _Duration>()) 
+static auto get_duration(Frequency frequency)->decltype(std::chrono::duration<_Rep, _Duration>())
 {
-    switch(frequency) 
+    switch(frequency)
     {
         case Frequency::Day:
             return std::chrono::days(1);

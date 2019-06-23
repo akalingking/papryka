@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        feed.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 9, 2016 1:37 AM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include "../detail/types.h"
@@ -28,7 +27,7 @@
 #include <memory>
 #include <map>
 
-namespace papryka { 
+namespace papryka {
 
 template <typename _T=real_t>
 class Feed : public Subject
@@ -96,14 +95,14 @@ private:
 };
 
 template <typename _T>
-class FeedMemFilter : public FeedMem<_T> 
+class FeedMemFilter : public FeedMem<_T>
 {
 protected:
     std::shared_ptr<detail::RowFilter<_T>> row_filter_;
-    FeedMemFilter(Frequency frequency, size_t maxlen) : FeedMem<_T>(frequency, maxlen) 
-    { log_trace("FeedMemFilter created"); }    
+    FeedMemFilter(Frequency frequency, size_t maxlen) : FeedMem<_T>(frequency, maxlen)
+    { log_trace("FeedMemFilter created"); }
 public:
-    void set_date_range(const datetime_t& from, const datetime_t& to) 
+    void set_date_range(const datetime_t& from, const datetime_t& to)
     { row_filter_.reset(new detail::DateRowFilter<_T>(from, to)); }
 };
 
