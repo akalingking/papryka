@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        date.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 2, 2016 8:41 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 namespace {
     time_t get_utc_offset()
@@ -26,7 +25,7 @@ namespace {
         assert (timeinfo);
         return timeinfo->tm_gmtoff;
     }
-    
+
     bool to_tm(struct tm& tm, const datetime_t& datetime, const char* tz=nullptr)
     {
         bool ret = true;
@@ -47,11 +46,11 @@ namespace {
             char* old_tz = std::getenv("TZ");
             setenv("TZ", tz, 1);
             tzset();
-            
+
             t = Clock::to_time_t(datetime);
             time_t offset = get_utc_offset();
             char * tz = getenv("TZ");
-            
+
             if (offset != 0 && tz != nullptr)
             {
                 //Log4_DEBUG("Timezone \"%s\" offset=%ld", tz, offset);
@@ -62,15 +61,15 @@ namespace {
                 log_error("invalid timezone \"{}\" offset={ld}", tz, offset);
                 ret = false;
             }
-            
+
             if (old_tz != nullptr)
                 setenv("TZ", old_tz, 1);
             else
                 unsetenv("TZ");
             tzset();
-        }    
+        }
         return ret;
-    }   
+    }
 } // namespace
 
 /**
@@ -86,25 +85,25 @@ time_t to_time_t(const char* date, const char* dateFormat)
     // Tell mktime to figure out the daylight saving time by setting to -1
     // however, tm_.tm_isdst = -1 is unreliable and does not work for american time.
     tm_.tm_isdst = 1;
-    time_t t_ = mktime(&tm_); 
+    time_t t_ = mktime(&tm_);
     // mktime localtime, get offset to get gmtime
     time_t offset = get_utc_offset();
     //log_debug("offset hr={}", offset);
     t_ += offset;
     return t_;
 }
- 
+
 datetime_t to_datetime(const char* date, const char* dateFormat)
 {
     // time_t only handles up to second resolution
     datetime_t datetime =  Clock::from_time_t(to_time_t(date, dateFormat));
     // check if we have ms format
-    if (strstr(dateFormat, "%S.") != nullptr) 
+    if (strstr(dateFormat, "%S.") != nullptr)
     {
         char sz[10];
-        memset(&sz, '\0', 10);        
+        memset(&sz, '\0', 10);
         const char* value = strchr(date, '.');
-        if (value != nullptr) 
+        if (value != nullptr)
         {
             // obtain length of the millisecond string
             std::size_t len = strlen(date) - (value - date);
@@ -135,7 +134,7 @@ date_t to_date(const datetime_t& datetime)
 }
 
 const char* to_str(const date_t& date, const char* dateFormat)
-{   
+{
     static char szdate[20];
     memset(szdate, '\0', 20);
     time_t t_ = std::chrono::duration_cast<Seconds>(date.time_since_epoch()).count();
@@ -145,12 +144,12 @@ const char* to_str(const date_t& date, const char* dateFormat)
 }
 
 const char* to_str(const datetime_t& datetime, const char* dateFormat, const char* tz)
-{   
+{
     static const size_t date_max_len = 25;
     static const size_t datetosec_len = date_max_len - 3;
     static char szdate[date_max_len];
     memset(szdate, '\0', date_max_len);
-    
+
     std::time_t t;
     struct tm tm_;
     if (tz==nullptr || !strcmp(tz, "UTC"))
@@ -173,11 +172,11 @@ const char* to_str(const datetime_t& datetime, const char* dateFormat, const cha
         // https://users.pja.edu.pl/~jms/qnx/help/watcom/clibref/global_data.html
         // NOTE: this is working only on specific uniz TZ format such as: EST5EDT, PST8PDT
         t = std::chrono::duration_cast<Seconds>(datetime.time_since_epoch()).count();
-        
+
         char* old_tz = std::getenv("TZ");
         setenv("TZ", tz, 1);
         tzset();
-        
+
         time_t offset = get_utc_offset();
         if (offset != 0 && getenv("TZ") != nullptr)
         {
@@ -188,12 +187,12 @@ const char* to_str(const datetime_t& datetime, const char* dateFormat, const cha
         {
             log_error("timezone \"{}\", invalid offset {ld}", getenv("TZ"), offset);
         }
-        
+
         if (old_tz != nullptr)
             setenv("TZ", old_tz, 1);
         else
             unsetenv("TZ");
-        
+
         tzset();
     }
     //log_debug("date::{} format={} szdate='{}'", __func__, dateFormat, szdate);
@@ -261,7 +260,7 @@ int get_month(const datetime_t& datetime)
     std::tm tm = {0};
     if (to_tm(tm, datetime))
         ret = tm.tm_mon + 1; // 0-11, from Jan
-    return ret;   
+    return ret;
 }
 
 int get_day(const datetime_t& datetime, const char* tz)

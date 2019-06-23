@@ -10,18 +10,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        logger.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 9, 2016 7:51 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include <spdlog/spdlog.h>
-/**
- * @note user defined ostream operator seems to be failing on recent spdlog version
- * add this header to fix
- */
+#include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/fmt/ostr.h>
 #include <memory>
 #include <cassert>
@@ -45,9 +42,6 @@ public:
     {
         logger_t logger;
 
-        if (async)
-            spdlog::set_async_mode(asyncQueueSize);
-
         if (!filepath.empty())
         {
             std::string file = filepath;
@@ -59,14 +53,7 @@ public:
                 file = filepath.substr(0, found);
             }
 
-            std::shared_ptr<spdlog::sinks::rotating_file_sink_mt> sink = std::make_shared<
-                spdlog::sinks::rotating_file_sink_mt>(file+ext, 1024 * 100 * 5, 5);
-            
-            logger = std::make_shared<spdlog::logger>(name, sink);
-
-            spdlog::register_logger(logger);
-
-            // logger = spdlog::rotating_logger_mt(name, filepath, 1048576 * 5, 3);
+            logger = spdlog::rotating_logger_mt(name, file+ext, 1024 * 100 * 5, 5);
         }
         else
         {
@@ -125,7 +112,7 @@ public:
     {
         get_debug_logger()->warn(fmt, args...);
     }
-    
+
     template <typename...Args> static void log_error(const char* fmt, const Args&...args)
     {
         get_debug_logger()->error(fmt, args...);
@@ -142,7 +129,7 @@ public:
     template <typename...Args> static void log_warn(const char* fmt, const Args&...args)
     {
     }
-    
+
     template <typename...Args> static void log_error(const char* fmt, const Args&...args)
     {
     }

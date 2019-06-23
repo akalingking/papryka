@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        matrix.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        June 12, 2017 9:47 AM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com> 
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include "timeseries.h"
@@ -25,7 +24,7 @@
 #include <tuple>
 
 namespace papryka {
-    
+
 template <typename _T>
 _T** create_matrix(size_t row, size_t col) {
     _T** t = new _T*[row];
@@ -60,7 +59,7 @@ template <typename _T>
 void print(_T** x, unsigned int row, unsigned int col)
 {
     std::cout << std::endl;
-    for (unsigned int i=0; i<row; ++i) 
+    for (unsigned int i=0; i<row; ++i)
     {
         for (unsigned int j=0; j<col; ++j)
             std::cout << x[i][j] << " ";
@@ -70,9 +69,9 @@ void print(_T** x, unsigned int row, unsigned int col)
 }
 
 template <typename _T>
-void print(_T* x, unsigned int row, unsigned int col) 
+void print(_T* x, unsigned int row, unsigned int col)
 {
-    for (unsigned int i=0; i<row; ++i) 
+    for (unsigned int i=0; i<row; ++i)
     {
         for (unsigned int j=0; j<col;++j)
             std::cout << (_T)*((x + i*col) + j) << " ";
@@ -126,8 +125,7 @@ template <typename _T, typename _U, typename _K = std::enable_if_t<std::is_arith
 bool ts_to_mat(const Timeseries<_T>& ts, Matrix<_U>& mat) {
     if (mat.rows != ts.size()) return false;
     if (ts.column_size() != 1) return false;
-    if (mat.cols != 1)
-    	return false;
+    if (mat.cols != 1) return false;
 	for (size_t i=0; i<ts.size(); ++i)
 	{
 		const typename Timeseries<_T>::row_t& row = ts[i];

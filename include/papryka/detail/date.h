@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        date.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 2, 2016 10:33 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include <chrono>
@@ -40,7 +39,7 @@ typedef duration<int, ratio_multiply<chrono::days::period,  ratio<365> >::type> 
 }}
 
 namespace papryka {
-    
+
 // Clock type
 using Clock = std::chrono::high_resolution_clock;
 // Duration types
@@ -48,11 +47,11 @@ using Months = std::chrono::months;
 using Weeks = std::chrono::weeks;
 using Days = std::chrono::days;
 using Hours = std::chrono::hours;
-using Minutes = std::chrono::minutes; 
-using Seconds = std::chrono::seconds; 
+using Minutes = std::chrono::minutes;
+using Seconds = std::chrono::seconds;
 using Milliseconds = std::chrono::milliseconds;
 using Microseconds = std::chrono::microseconds;
-using Nanoseconds = std::chrono::nanoseconds; 
+using Nanoseconds = std::chrono::nanoseconds;
 // Timepoint types
 template<class Duration>
 using Timepoint = std::chrono::time_point<Clock, Duration>;
@@ -67,50 +66,50 @@ typedef std::vector<datetime_t> datetimes_t;
 
 // operations
 /**
- * 
+ *
  * @param date
  * @param dateFormat
- * @return 
+ * @return
  */
 inline time_t to_time_t(const char* date, const char* dateFormat=s_datetime_ms_format);
 /**
- * 
+ *
  * @param date
  * @param dateFormat
- * @return 
+ * @return
  */
 inline datetime_t to_datetime(const char* date, const char* dateFormat=s_datetime_ms_format);
 /**
- * 
+ *
  * @param date
  * @param dateFormat
- * @return 
+ * @return
  */
 inline date_t to_date(const char* date, const char* dateFormat=s_date_format);
 /**
- * 
+ *
  * @param date
- * @return 
+ * @return
  */
 inline datetime_t to_datetime(const date_t& date);
 /**
- * 
+ *
  * @param datetime
- * @return 
+ * @return
  */
 inline date_t to_date(const datetime_t& datetime);
 /**
- * 
+ *
  * @param datetime
  * @param tz
- * @return 
+ * @return
  */
 inline datetime_t to_tz(const datetime_t& datetime, const char* tz);
 /**
- * 
+ *
  * @param date
  * @param dateFormat
- * @return 
+ * @return
  */
 inline const char* to_str(const date_t& date, const char* dateFormat=s_date_format);
 /**
@@ -119,58 +118,58 @@ inline const char* to_str(const date_t& date, const char* dateFormat=s_date_form
  * @param date
  * @param dateFormat
  * @param tz
- * @return 
+ * @return
  */
 inline const char* to_str(const datetime_t& date, const char* dateFormat=s_datetime_format, const char* tz=nullptr);
 /**
- * 
+ *
  * @param datetime
- * @return 
+ * @return
  */
 inline int get_year(const datetime_t& datetime);
 /**
- * 
+ *
  * @param datetime
- * @return 
+ * @return
  */
 inline int get_month(const datetime_t& datetime);
 /**
- * 
+ *
  * @param datetime
  * @param tz
- * @return 
+ * @return
  */
 inline int get_day(const datetime_t& datetime, const char* tz="UTC");
 /**
- * 
+ *
  * @param datetime
  * @param tz
- * @return 
+ * @return
  */
 inline int get_hour(const datetime_t& datetime, const char* tz="UTC");
 /**
- * 
+ *
  * @param datetime
- * @return 
+ * @return
  */
 inline int get_minute(const datetime_t& datetime);
 /**
- * 
+ *
  * @param datetime
- * @return 
+ * @return
  */
 inline int get_second(const datetime_t& datetime);
 /**
- * 
+ *
  * @param datetime
- * @return 
+ * @return
  */
 inline unsigned long get_millisecond(const datetime_t& datetime);
 /**
- * 
+ *
  * @param datetime
  * @param tz
- * @return 
+ * @return
  */
 inline bool is_weekday(const datetime_t& datetime, const char* tz=nullptr);
 /**
@@ -181,7 +180,7 @@ inline bool is_weekday(const datetime_t& datetime, const char* tz=nullptr);
  *                   [numeric_limits<Int>::min()/366, numeric_limits<Int>::max()/366]
  *                 Exact range of validity is:
  *                 [civil_from_days(numeric_limits<Int>::min()),
- *                  civil_from_days(numeric_limits<Int>::max()-719468)] 
+ *                  civil_from_days(numeric_limits<Int>::max()-719468)]
  * @param y
  * @param m
  * @param d
@@ -192,7 +191,7 @@ template <class Int>
 constexpr Int days_from_civil(Int y, unsigned m, unsigned d) noexcept;
 /**
  * Preconditions:  z is number of days since 1970-01-01 and is in the range:
- *                 [numeric_limits<Int>::min(), numeric_limits<Int>::max()-719468]. 
+ *                 [numeric_limits<Int>::min(), numeric_limits<Int>::max()-719468].
  * @param z
  * @return ear/month/day triple in civil calendar
  */
@@ -200,31 +199,31 @@ template <class Int>
 constexpr std::tuple<Int, unsigned, unsigned>
 civil_from_days(Int z) noexcept;
 /**
- * 
+ *
  * @param z
- * @return 
+ * @return
  */
 template <class Int>
 constexpr unsigned
 weekday_from_days(Int z) noexcept;
 /**
- * 
+ *
  * @param d
- * @return 
+ * @return
  */
 template <class To, class Rep, class Period>
 To round_down(const std::chrono::duration<Rep, Period>& d);
 /**
- * 
+ *
  * @param tp
- * @return 
+ * @return
  */
 template <class Duration>
 std::tm utc_tm(std::chrono::time_point<std::chrono::system_clock, Duration> tp);
 
 typedef ql::Date qdatetime_t;
 /**
- * 
+ *
  * @param datetime
  * @return quantlib datetime format
  */

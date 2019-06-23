@@ -1,6 +1,4 @@
 /**
- * Copyright 2015 Ariel Kalingking <akalingking@gmail.com>
- * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * @file        strategy.h
+ * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 template <typename _D, typename _T>
 class Strategy<_D,_T>::Position::Tracker
@@ -27,7 +29,7 @@ public:
     inline void buy(size_t quantity, real_t price, real_t commission);
     inline void sell(size_t quantity, real_t price, real_t commission);
     inline void reset();
-        
+
 private:
     inline void update_(size_t quantity, real_t price, real_t commission);
     real_t shares_;
@@ -61,7 +63,7 @@ void Strategy<_D,_T>::Position::Tracker::update_(size_t quantity, real_t price, 
         // Opening new position
         total_shares = quantity;
         cost_per_share_ = price;
-        cost_basis_ = abs(quantity) * price;
+        cost_basis_ = std::fabs(quantity) * price;
     }
     else
     {
@@ -71,16 +73,16 @@ void Strategy<_D,_T>::Position::Tracker::update_(size_t quantity, real_t price, 
             // copysign
             size_t prev_direction = (shares_ > 0) ? 1.0 :-1.0;
             size_t txnDirection = (quantity > 0) ? 1.0 : -1.0;
-            
+
             if (prev_direction != txnDirection)
             {
-                if (abs(quantity) > abs(shares_))
+                if (std::labs(quantity) > std::labs(shares_))
                 {
                     // Going from Long to short or vice versa
                     // Update cost as a new position is being opened.
                     cost_per_share_ = price;
                     size_t diff = precision::round(shares_ + quantity);
-                    cost_basis_ = abs(diff) * price;
+                    cost_basis_ = std::labs(diff) * price;
                 }
                 else
                 {
@@ -95,7 +97,7 @@ void Strategy<_D,_T>::Position::Tracker::update_(size_t quantity, real_t price, 
                 size_t prev_cost = cost_per_share_ * shares_;
                 size_t txn_cost = quantity * price;
                 cost_per_share_ = (prev_cost + txn_cost) / total_shares;
-                cost_basis_ += abs(quantity) * price;
+                cost_basis_ += std::labs(quantity) * price;
             }
         }
         else
@@ -141,7 +143,7 @@ template <typename _D, typename _T>
 void Strategy<_D,_T>::Position::Tracker::buy(size_t quantity, real_t price, real_t commission)
 {
     assert (quantity > 0);
-    this->update_(quantity, price, commission);   
+    this->update_(quantity, price, commission);
 }
 
 template <typename _D, typename _T>
@@ -157,7 +159,7 @@ struct Strategy<_D,_T>::Position::StateMachine
 {
     Position& position;
     State state;
-    
+
     inline StateMachine(Position& position);
     inline ~StateMachine();
     inline void switch_state(State newState);
@@ -168,7 +170,7 @@ struct Strategy<_D,_T>::Position::StateMachine
     inline void exit(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled);
 };
 #include "statemachine.ipp"
-    
+
 template <typename _D, typename _T> template<typename _U> uint32_t Strategy<_D,_T>::Position::statics_<_U>::id = 0;
 template <typename _D, typename _T> template<typename _U> const char*  Strategy<_D,_T>::Position::statics_<_U>::directions[] = {"LongOnly","ShortOnly","LongShort"};
 template <typename _D, typename _T> template<typename _U> const char* Strategy<_D,_T>::Position::statics_<_U>::states[] = {"StateIdle","StateOpen","StateClose"};
@@ -194,10 +196,10 @@ void Strategy<_D,_T>::Position::submit_and_register_order(order_ptr_t order)
         assert(false);
         return;
     }
-    
+
     if (!order->is_submitted())
         strategy.exchange->submit_order(order);
-    
+
     strategy.register_position_order(id, order->id);
     active_orders_[order->id] = order;
 }
@@ -206,28 +208,28 @@ template <typename _D, typename _T>
 void Strategy<_D,_T>::Position::submit_exit_order(real_t stopPrice, real_t limitPrice, bool isGoodTillCanceled)
 {
     assert (!is_exit_active());
-    
+
     exit_order = build_exit_order(stopPrice, limitPrice);
     isGoodTillCanceled = entry_order->is_good_till_canceled;
     exit_order->is_good_till_canceled = isGoodTillCanceled;
     exit_order->is_all_or_none = is_all_or_none;
-    
+
     submit_and_register_order(exit_order);
 }
 
 template <typename _D, typename _T>
 void Strategy<_D,_T>::Position::on_order_event(order_event_ptr_t orderEvent)
-{   
+{
     log_trace("Position:{} {} id={} event={} order type={} action={}", __func__,
             papryka::to_str(orderEvent->datetime), id, order_t::Event::to_str(orderEvent->type),
-            order_t::to_str(orderEvent->order->type), 
+            order_t::to_str(orderEvent->order->type),
             order_t::to_str(orderEvent->order->action));
-    
+
     assert (orderEvent->order);
-    
+
 //    update_pos_tracker_(*orderEvent);
     order_t* order = (order_t*)orderEvent->order;
-    
+
     if (!order->is_active())
     {
         // Do not erase since we will remove the pointer
@@ -239,7 +241,7 @@ void Strategy<_D,_T>::Position::on_order_event(order_event_ptr_t orderEvent)
         // remark this for now
         active_orders_.erase(order->id);
     }
-    
+
     if (orderEvent->type == order_t::Event::Filled || orderEvent->type == order_t::Event::PartiallyFilled)
     {
         order_info_t* info = orderEvent->info.get();
@@ -249,23 +251,23 @@ void Strategy<_D,_T>::Position::on_order_event(order_event_ptr_t orderEvent)
         else
             shares_ -= precision::round(info->quantity);
 
-        log_trace("Position::{} {} id={} event={} order type={} action={} price={} size={} current share(s)={} order info date={}", 
+        log_trace("Position::{} {} id={} event={} order type={} action={} price={} size={} current share(s)={} order info date={}",
                 __func__, papryka::to_str(orderEvent->datetime), id, order_t::Event::to_str(orderEvent->type),
                 order_t::to_str(order->type), order_t::to_str(order->action),
                 info->price, info->quantity, shares_, papryka::to_str(info->datetime));
     }
-    
+
     statemachine_->on_order_event(*orderEvent.get());
 }
 
 template <typename _D, typename _T>
 void Strategy<_D,_T>::Position::update_pos_tracker(order_event_t& orderEvent)
-{   
+{
     if (orderEvent.type == order_t::Event::PartiallyFilled || orderEvent.type  == order_t::Event::Filled)
     {
         order_t* order = (order_t*)orderEvent.order;
         order_info_t* info = orderEvent.info.get();
-        if (order && info) 
+        if (order && info)
         {
             if (order->is_buy())
                 tracker_->buy(info->quantity, info->price, info->commission);
@@ -276,27 +278,27 @@ void Strategy<_D,_T>::Position::update_pos_tracker(order_event_t& orderEvent)
 }
 
 template <typename _D, typename _T>
-bool Strategy<_D,_T>::Position::is_entry_active() const 
-{ 
+bool Strategy<_D,_T>::Position::is_entry_active() const
+{
     return (entry_order && entry_order->is_active());
 }
 
 template <typename _D, typename _T>
-bool Strategy<_D,_T>::Position::is_entry_filled() const 
-{   
+bool Strategy<_D,_T>::Position::is_entry_filled() const
+{
     return (entry_order && entry_order->is_filled());
 }
 
 template <typename _D, typename _T>
-bool Strategy<_D,_T>::Position::is_exit_active() const 
+bool Strategy<_D,_T>::Position::is_exit_active() const
 {
     return (exit_order && exit_order->is_active());
 }
 
 template <typename _D, typename _T>
-bool Strategy<_D,_T>::Position::is_exit_filled() const 
-{ 
-    return (exit_order && exit_order->is_filled()); 
+bool Strategy<_D,_T>::Position::is_exit_filled() const
+{
+    return (exit_order && exit_order->is_filled());
 }
 
 template <typename _D, typename _T>
@@ -307,9 +309,9 @@ bool Strategy<_D,_T>::Position::is_open() const
 }
 
 template <typename _D, typename _T>
-const std::string& Strategy<_D,_T>::Position::get_symbol() const 
-{ 
-    return entry_order->symbol; 
+const std::string& Strategy<_D,_T>::Position::get_symbol() const
+{
+    return entry_order->symbol;
 }
 
 template <typename _D, typename _T>
@@ -327,8 +329,8 @@ void Strategy<_D,_T>::Position::cancel_exit()
 }
 
 template <typename _D, typename _T>
-void Strategy<_D,_T>::Position::exit_market(bool goodTillCanceled) 
-{ 
+void Strategy<_D,_T>::Position::exit_market(bool goodTillCanceled)
+{
     assert (statemachine_.get());
     statemachine_->exit(0, 0, goodTillCanceled);
 }
@@ -365,7 +367,7 @@ template <typename _D, typename _T>
 real_t Strategy<_D,_T>::Position::get_return(bool includeCommission) const
 {
     log_trace("Position:{0:} last price {1:0.3f}", __func__, get_last_price());
-    
+
     real_t ret = 0;
     real_t price = get_last_price();
     if (price != 0)
@@ -390,16 +392,16 @@ template <typename _D, typename _T>
 const Milliseconds Strategy<_D,_T>::Position::get_age() const
 {
     Milliseconds age = Milliseconds(0);
-    if (entry_datetime != nulldate) 
+    if (entry_datetime != nulldate)
     {
-        datetime_t last = (exit_datetime != nulldate) ? exit_datetime : strategy.get_current_datetime();    
+        datetime_t last = (exit_datetime != nulldate) ? exit_datetime : strategy.get_current_datetime();
         age = std::chrono::duration_cast<Milliseconds>(last - entry_datetime);
     }
     return age;
 }
-//    
-template <typename _D, typename _T>    
-LongPosition<_D,_T>::LongPosition(strategy_t& strategy, const std::string& symbol, real_t stopPrice, real_t limitPrice, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone) : 
+//
+template <typename _D, typename _T>
+LongPosition<_D,_T>::LongPosition(strategy_t& strategy, const std::string& symbol, real_t stopPrice, real_t limitPrice, size_t quantity, bool isGoodTillCanceled, bool isAllOrNone) :
             base_t(strategy, isGoodTillCanceled, isAllOrNone, base_t::Position::LongOnly, Market::Stock)
 {
     assert (quantity > 0);
@@ -423,17 +425,17 @@ LongPosition<_D,_T>::LongPosition(strategy_t& strategy, const std::string& symbo
     {
         assert (false);
     }
-    
+
     base_t::entry_order->is_all_or_none = isAllOrNone;
 
     base_t::entry_order->is_good_till_canceled = isGoodTillCanceled;
-    
+
     base_t::tracker_.reset(new typename base_t::Tracker());
-    
+
     base_t::submit_and_register_order(base_t::entry_order);
-    
+
     base_t::statemachine_->switch_state(base_t::StateIdle);
-    
+
     log_trace("LongPosition::{} id={}", __func__, base_t::id);
 }
 
@@ -447,11 +449,11 @@ template <typename _D, typename _T>
 typename LongPosition<_D,_T>::order_ptr_t LongPosition<_D,_T>::build_exit_order(real_t stopPrice, real_t limitPrice)
 {
     log_debug("LongPosition::{} id={} stop={} limit={}", __func__, base_t::id, stopPrice, limitPrice);
-    
+
     std::string symbol = base_t::get_symbol();
-    
+
     size_t quantity = base_t::shares_;
-    
+
     order_ptr_t order;
     if (limitPrice == 0 && stopPrice == 0)
     {
@@ -471,7 +473,7 @@ typename LongPosition<_D,_T>::order_ptr_t LongPosition<_D,_T>::build_exit_order(
     }
     else
         assert (false);
-    
+
     return order;
 }
 
@@ -497,15 +499,15 @@ ShortPosition<_D,_T>::ShortPosition(strategy_t& strategy, const std::string& sym
     }
     else
         assert (false);
-    
+
     this->entry_order->is_all_or_none = isAllOrNone;
 
     this->entry_order->is_good_till_canceled = isGoodTillCanceled;
-    
+
     this->submit_and_register_order(this->entry_order);
-    
+
     this->statemachine_->switch_state(base_t::StateIdle);
-    
+
     log_trace("ShortPosition::{} id={}", __func__, this->id);
 }
 
@@ -519,10 +521,10 @@ template <typename _D, typename _T>
 typename ShortPosition<_D,_T>::order_ptr_t ShortPosition<_D,_T>::build_exit_order(real_t stopPrice, real_t limitPrice)
 {
     log_trace("ShortPosition<_D,_T>::{} id={} stop={} limit={}", __func__, this->id, stopPrice, limitPrice);
-    
+
     std::string symbol = this->get_symbol();
     size_t quantity = this->shares_ * -1;
-    
+
     order_ptr_t order;
     if (limitPrice == 0 && stopPrice == 0)
     {
@@ -542,7 +544,7 @@ typename ShortPosition<_D,_T>::order_ptr_t ShortPosition<_D,_T>::build_exit_orde
     }
     else
         assert (false);
-    
+
     return order;
 }
 

@@ -10,11 +10,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @file        syntheticfeed.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @date        July 16, 2016 6:16 PM
- * @copyright   (c) 2016-2026 <www.sequenceresearch.com>
+ * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include "../detail/date.h"
@@ -35,20 +34,20 @@
 namespace papryka {
 
 // Generator implementation
-struct GeneratorBase 
+struct GeneratorBase
 {
     static const constexpr size_t maxlen = 1024;
     datetime_t start;
     datetime_t end;
     Frequency frequency;
-    
+
 protected:
     inline GeneratorBase(const datetime_t& start, const datetime_t& end, Frequency frequency=Frequency::Day) :
             start(start), end(end), frequency(frequency) {}
 };
 
-//@{ Basic Random Generator 
-struct Generator_ : GeneratorBase 
+//@{ Basic Random Generator
+struct Generator_ : GeneratorBase
 {
 protected:
     typedef std::uniform_real_distribution<double> dist_t;
@@ -58,7 +57,7 @@ protected:
     inline Generator_(const datetime_t& start, const datetime_t& end, Frequency frequency);
 };
 
-template <typename _T> 
+template <typename _T>
 struct BasicGenerator;
 
 template <>
@@ -105,11 +104,11 @@ struct GbmGenerator<Bar> : GeneratorBase
     typedef typename Traits<value_t>::row_t row_t;
     typedef typename Traits<value_t>::rows_t rows_t;
     typedef Timeseries<value_t> timeseries_t;
-    typedef GBM<real_t> gbm_t; 
+    typedef GBM<real_t> gbm_t;
     gbm_t open;
     gbm_t high;
     gbm_t low;
-    gbm_t  close; 
+    gbm_t  close;
     gbm_t volume;
     inline GbmGenerator(const datetime_t& start, const datetime_t& end, const value_t& startPrice, real_t volatilityPct, real_t meanRetPct, Frequency frequency);
     inline size_t generate(rows_t& rows);
@@ -120,7 +119,7 @@ struct GbmGenerator<Bar> : GeneratorBase
  *@brief Synthetic feed uses GBM as default generator
  */
 template<typename _T=real_t, typename _Generator=GbmGenerator<_T> >
-class FeedSynthetic : public FeedMemFilter<_T> 
+class FeedSynthetic : public FeedMemFilter<_T>
 {
 public:
     struct Data {
@@ -140,6 +139,6 @@ private:
     datetime_t start_;
     datetime_t end_;
 };
-    
+
 #include "impl/feedsynthetic.ipp"
 }

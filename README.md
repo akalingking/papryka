@@ -5,7 +5,7 @@
 
 * Trading system platform
 
-* Uses c++ template,  header only library 
+* Uses c++ template,  header only library
 
 * Components extensible with custom objects (e.g. bar type, memory allocator, etc.)
 
@@ -16,11 +16,13 @@
 
 [1] spdlg       "https://github.com/gabime/spdlog"
 
-[2] quantlib    "http://quantlib.org/download.shtml"
+[2] quantlib    libquantlib0-dev or from [quantlib source]("https://quantlib.org/download.shtml")
 
 [3] googletest	"https://github.com/google/googletest"
 
 [4] gcovr       "http://gcovr.com/"
+
+[5] curl        libcurl4-gnutls-dev
 
 ## EXAMPLE
 
