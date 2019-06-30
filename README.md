@@ -11,13 +11,13 @@
 
 * To use just copy header directory and start building trade strategies, see test files for reference.
 
-* This is largely based from Python [`PyAlgoTrade:`](https://github)(https://github.com/gbeced/pyalgotrade).
+* This is largely based from Python [`PyAlgoTrade`](https://github.com/gbeced/pyalgotrade)
 
 ## REQUIREMENTS
 ```ascii
 [1] spdlg       "https://github.com/gabime/spdlog"
 
-[2] quantlib    libquantlib0-dev or from [`quantlib source:`] (https://quantlib.org/download.shtml)
+[2] quantlib    libquantlib0-dev or from [`quantlib source`] (https://quantlib.org/download.shtml)
 
 [3] googletest	"https://github.com/google/googletest"
 
