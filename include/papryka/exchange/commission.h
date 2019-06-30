@@ -21,11 +21,48 @@
 
 namespace papryka {
 
-    struct NoCommission {
+    struct Commission {};
+
+    struct NoCommission : Commission {
         template <typename _Order>
         real_t calculate(_Order& order, real_t price, size_t quantity) {
             return 0;
         }
     };
+
+    struct FixedPerTradeCommission : Commission {
+        FixedPerTradeCommission(real_t amount) : amount_(amount) {
+        }
+
+        template <typename _Order>
+        real_t calculate(_Order& order, real_t price, size_t quantity) {
+
+            real_t ret = 0.0;
+            if (order.get_execution_info() == nullptr)
+                ret = amount_;
+            return ret;
+        }
+
+    private:
+        real_t amount_;
+    };
+
+
+class TradePercentageCommission : Commission
+{
+public:
+    TradePercentageCommission(real_t percent) : percent_(percent) {
+    }
+
+    template <typename _Order>
+    double calculate(_Order& order, double price, int quantity) {
+        return price * quantity * percent_;
+    }
+
+private:
+    real_t percent_;
+};
+
+
 
 } // namespace papryka

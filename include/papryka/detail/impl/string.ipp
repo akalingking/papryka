@@ -13,7 +13,6 @@
  *
  * @file        string.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 std::string &ltrim(std::string &s)
 {

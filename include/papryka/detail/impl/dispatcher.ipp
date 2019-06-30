@@ -13,7 +13,6 @@
  *
  * @file        dispatcher.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 Dispatcher::Dispatcher() : is_run_(false)
 {

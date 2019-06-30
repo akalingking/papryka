@@ -13,7 +13,6 @@
  *
  * @file        date.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 namespace {
     time_t get_utc_offset()
