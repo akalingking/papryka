@@ -41,7 +41,7 @@ public:
     timeseries_t low;
     timeseries_t close;
     timeseries_t volume;
-    BarTimeseries( Frequency frequency=Frequency::Day, size_t maxlen=1024, Event* eventNewValue=nullptr);
+    BarTimeseries(Frequency frequency=Frequency::Day, size_t maxlen=1024, Event* eventNewValue=nullptr);
     void push_back(const row_t& row);
 };
 

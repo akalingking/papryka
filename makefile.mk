@@ -3,7 +3,7 @@ CXX         = g++
 CXXFLAGS    = -O2 -Wall -Wno-switch -Wno-reorder -Wno-unused-function -ggdb -std=c++17 -D_DEBUG -DREENTRANT -DPAPRYKA_DEBUG_ON #-DPAPRYKA_TRACE_ON
 INCLUDES    = -I/usr/include -I/usr/local/include
 LFLAGS      = -L/usr/lib -L/usr/local/lib -L/usr/lib/x86_64-linux-gnu
-LIBS        = -lstdc++ -lpthread
+LIBS        = -lstdc++ -lpthread -lboost_system
 
 UNITTEST_ON=true
 COVERAGE_ON=false

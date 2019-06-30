@@ -24,6 +24,8 @@
 [4] gcovr       "http://gcovr.com/"
 
 [5] curl        libcurl4-gnutls-dev
+
+[6] boost       (arrgH! Will make this go away later) just add libboost-all-dev
 ```
 
 

@@ -16,22 +16,61 @@
  */
 #pragma once
 #include <gnuplot-iostream.h>
-#include <paprika/detail/date.h>
+#include <papryka/detail/date.h>
 #include <papryka/detail/event.h>
-#include <papryka/feed/timeseries.h>
+#include <papryka/exchange/order.h>
+#include <papryka/feed/bar.h>
+#include <string>
+#include <map>
 
 namespace papryka {
-namespace util {
 
+    
+class SubplotBase
+{
+protected:
+    // put virtual functions here
+};
+
+template <typename _Bar> class Exchange;
+template <typename _Derived> class Strategy;
+template <typename _Bar> class Timeseries;
+
+template <typename _Strategy, typename _Bar>
 class Subplot
 {
 public:
-typedef std::shared_ptr<Timeseries> ts_ptr_t;
-typedef std::map<std::string, ts_ptr_t> ts_ptrs_t;
+    typedef Timeseries<_Bar> Timeseries_t;
+    typedef std::shared_ptr<Timeseries_t> ts_ptr_t;
+    typedef std::map<std::string, ts_ptr_t> ts_ptrs_t;
 
-virtual void on_bars(Strategy& strategy, const Bars& bars) {}
+    // fix virtual functions here
+    virtual void on_bars(Strategy<_Strategy>& strategy, const Bar& bars) {}
 
+    virtual void on_order_event(Exchange<_Bar>& exchange, std::shared_ptr<Order<> > orderEvent) {}
+
+    Timeseries_t* add_series(const std::string& name, Event*);
+
+    void remove_series(const std::string&);
+
+    Timeseries_t* get_series(const std::string&);
+
+    virtual void set_use_adj_values(bool) { assert(false); }
+
+    virtual void plot(Gnuplot&);
+
+    virtual void plot(Gnuplot&, const datetime_t&, const datetime_t&) = 0;
+
+    virtual void set_plot_buy_sell(bool) = 0;
+
+    virtual void set_plot_volume(bool) = 0;
+
+protected:
+    Subplot(const std::string& name);
+    std::string name_;
+    ts_ptrs_t series_;
 };
 
-} // namespace util
+#include "./ipp/plot.ipp"
+
 } // namespace papryka

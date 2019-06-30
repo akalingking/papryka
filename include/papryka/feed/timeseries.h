@@ -71,6 +71,8 @@ private:
     rows_t rows_;
 };
 
+typedef Timeseries<> Timeseries_t;
+
 #include "impl/timeseries.ipp"
 }
 
