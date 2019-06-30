@@ -13,7 +13,6 @@
  *
  * @file        bartimeseries.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 BarTimeseries::BarTimeseries(
     Frequency frequency,

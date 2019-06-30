@@ -13,7 +13,6 @@
  *
  * @file        main.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 #include <gtest/gtest.h>
 

@@ -13,7 +13,6 @@
  *
  * @file        feed/feed.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 template<typename _T>
 Feed<_T>::Feed(Frequency frequency, size_t maxLen) :

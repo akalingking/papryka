@@ -11,6 +11,7 @@
 
 * To use just copy header directory and start building trade strategies, see test files for reference.
 
+* This is largely based from Python [`PyAlgoTrade:`](https://github)(https://github.com/gbeced/pyalgotrade).
 
 ## REQUIREMENTS
 ```ascii
@@ -24,6 +25,8 @@
 
 [5] curl        libcurl4-gnutls-dev
 ```
+
+
 ## EXAMPLE
 
 `Sample code`: [`Basic Strategy`](https://github.com/akalingking/papryka/blob/master/test/strategy/strategybasic.cpp)

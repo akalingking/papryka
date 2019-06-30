@@ -13,7 +13,6 @@
  *
  * @file        order.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 /**
  * Returns the trigger price for a Stop or StopLimit order,

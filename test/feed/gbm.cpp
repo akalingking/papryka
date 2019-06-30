@@ -13,7 +13,6 @@
  *
  * @file        gbm.cpp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 
 int main()

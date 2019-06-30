@@ -13,7 +13,6 @@
  *
  * @file        bartimeseries.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 //@{ Basic Random Generator
 Generator_::Generator_(const datetime_t& start, const datetime_t& end, Frequency frequency) :

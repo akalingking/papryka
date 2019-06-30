@@ -13,7 +13,6 @@
  *
  * @file        bartimeseries.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 template<typename _T>
 FeedMem<_T>::FeedMem(Frequency frequency, size_t maxlen) :

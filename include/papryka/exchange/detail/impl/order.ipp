@@ -13,7 +13,6 @@
  *
  * @file        order.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 template <typename _T> Order::StateTable Order::state_table<_T>::value[] = {
     { Order::Initial, { Order::Submitted, Order::Canceled, Order::StateNone}},

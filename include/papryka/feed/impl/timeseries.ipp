@@ -13,7 +13,6 @@
  *
  * @file        timeseries.ipp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 
 template<typename _T, typename _Alloc>

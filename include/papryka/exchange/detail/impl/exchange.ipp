@@ -13,7 +13,6 @@
  *
  * @file        order.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 template <typename _T, typename _Fill, typename _Commission>
 Exchange<_T, _Fill, _Commission>::Exchange(feed_ptr_t feed, real_t cash) :

@@ -13,7 +13,6 @@
  *
  * @file        strategy.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 template <typename _D, typename _T>
 class Strategy<_D,_T>::Position::Tracker

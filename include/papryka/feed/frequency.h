@@ -13,7 +13,6 @@
  *
  * @file        frequency.h
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 #pragma once
 #include  "../detail/date.h"

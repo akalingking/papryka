@@ -13,7 +13,6 @@
  *
  * @file        bartimeseries.cpp
  * @author      Ariel Kalingking  <akalingking@sequenceresearch.com>
- * @copyright   (c) <www.sequenceresearch.com>
  */
 #include <gtest/gtest.h>
 #include <papryka/detail/date.h>
