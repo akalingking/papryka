@@ -1,0 +1,5 @@
+spdlog
+quantlib
+googletest
+gcovr
+curl
