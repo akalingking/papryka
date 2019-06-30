@@ -11,7 +11,7 @@
 
 * To use just copy header directory and start building trade strategies, see test files for reference.
 
-* This is largely based from Python [`PyAlgoTrade`](https://github)(https://github.com/gbeced/pyalgotrade)
+* This is largely based from Python [`PyAlgoTrade`](https://github.com/gbeced/pyalgotrade)
 
 ## REQUIREMENTS
 ```ascii
